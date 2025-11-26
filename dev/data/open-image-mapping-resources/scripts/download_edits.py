@@ -6,7 +6,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 BASE_PATH = "https://ml-site.cdn-apple.com/datasets/pico-banana-300k/nb/"
-MAX_WORKERS = 16  
+MAX_WORKERS = 24  
 
 def download_one(row, out_dir, session, retries=3):
     output_image_rel = row.get("output_image")
