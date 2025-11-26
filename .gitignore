@@ -1,0 +1,14 @@
+dev/data/openimage_source_images/input/train_0
+dev/data/openimage_source_images/input/train_1
+
+dev/data/open-image-mapping-resources/source-info/train-images-boxable-with-rotation.csv
+dev/data/open-image-mapping-resources/source-info/sft_with_local_source_image_path.jsonl
+dev/data/open-image-mapping-resources/source-info/sft.jsonl
+dev/data/open-image-mapping-resources/source-info/preference.jsonl
+
+*.zip
+*.vscode
+__pycache__/
+*.jsonl
+*.zip
+*.tar
