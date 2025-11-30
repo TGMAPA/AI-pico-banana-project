@@ -1,13 +1,18 @@
+# Image dirs
 dev/data/openimage_source_images/input/train_0
 dev/data/openimage_source_images/input/train_1
 dev/data/openimage_source_images/output
 dev/data/openimage_source_images/input
 
+# Resources maps and csv
 dev/data/open-image-mapping-resources/source-info/train-images-boxable-with-rotation.csv
 dev/data/open-image-mapping-resources/source-info/sft_with_local_source_image_path.jsonl
 dev/data/open-image-mapping-resources/source-info/sft.jsonl
 dev/data/open-image-mapping-resources/source-info/preference.jsonl
+dev/data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv
+dev/data/open-image-mapping-resources/source-info/filtered_sft_with_local_source_image_path.csv
 
+# General files
 *.zip
 *.vscode
 __pycache__/
