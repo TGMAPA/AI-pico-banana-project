@@ -2,12 +2,14 @@ import os
 import csv
 
 # Ruta al CSV que tiene la columna local_input_image
-CSV_PATH = r"/home/mapa/Documents/Tec/7S/IA-Avanzada/IA-Avanzada-2/FinalProject/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_sft_with_local_source_image_path.csv"
+CSV_PATH = r"/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_sft_with_local_source_image_path.csv"
+
+BASE_IMAGE_PATH = r"/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/openimage_source_images/input/"
 
 # Carpetas donde están las imágenes que quieres depurar
 IMAGE_DIRS = [
-    r"/home/mapa/Documents/Tec/7S/IA-Avanzada/IA-Avanzada-2/FinalProject/AI-pico-banana-project/dev/data/openimage_source_images/input/train_0",
-    r"/home/mapa/Documents/Tec/7S/IA-Avanzada/IA-Avanzada-2/FinalProject/AI-pico-banana-project/dev/data/openimage_source_images/input/train_1",
+    BASE_IMAGE_PATH + r"train_0",
+    BASE_IMAGE_PATH + r"train_1",
 ]
 
 DRY_RUN = False 

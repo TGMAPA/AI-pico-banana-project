@@ -16,13 +16,13 @@ import csv
 import json
 from tqdm import tqdm
 
-base_path = "/home/mapa/Documents/Tec/7S/IA-Avanzada/IA-Avanzada-2/FinalProject/data/"
+base_path = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/"
 
 is_multi_turn = False  # <-- Set to True for multi-turn format
 metadata_csv = base_path + "train-images-boxable-with-rotation.csv"
 jsonl_in = base_path + "sft.jsonl"  # or preference.jsonl or multi-turn.jsonl;change to your actual file path
 jsonl_out = base_path + "sft_with_local_source_image_path.jsonl" # change to your actual desired file path
-image_root = base_path + "openimage_source_images"  # parent folder containing train_*/ folders; change to your actual file path
+image_root = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/openimage_source_images/input"
 
 
 print("📘 Loading metadata mapping (URL → ImageID)...")

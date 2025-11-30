@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-path = "/home/mapa/Documents/Tec/7S/IA-Avanzada/IA-Avanzada-2/FinalProject/AI-pico-banana-project/dev/data/open-image-mapping-resources/sft_with_local_source_image_path.jsonl"
+path = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/sft_with_local_source_image_path.jsonl"
 
 df_local_map = pd.read_json(path, lines=True)
 
