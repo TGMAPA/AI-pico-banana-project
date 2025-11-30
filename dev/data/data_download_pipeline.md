@@ -1,6 +1,3 @@
-
-
-
 # Apple Pico-Banana Repo Download (https://github.com/apple/pico-banana-400k/tree/main?tab=readme-ov-file)
 
 ```bash
@@ -21,6 +18,9 @@ wget https://storage.googleapis.com/openimages/2018_04/train/train-images-boxabl
 
 # Download SFT jsonl base map
 wget https://ml-site.cdn-apple.com/datasets/pico-banana-300k/nb/jsonl/sft.jsonl
+
+# Download SFT manifest (output images urls)
+wget https://ml-site.cdn-apple.com/datasets/pico-banana-300k/nb/manifest/sft_manifest.txt
 
 # Map urls to local paths
 python map_openimage_url_to_local.py #please modify variable is_multi_turn and file paths as needed
