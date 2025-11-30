@@ -19,6 +19,9 @@ tar -xvzf train_1.tar.gz -C openimage_source_images
 # Download metadata CSV (ImageID ↔ OriginalURL mapping)  
 wget https://storage.googleapis.com/openimages/2018_04/train/train-images-boxable-with-rotation.csv
 
+# Download SFT jsonl base map
+wget https://ml-site.cdn-apple.com/datasets/pico-banana-300k/nb/jsonl/sft.jsonl
+
 # Map urls to local paths
 python map_openimage_url_to_local.py #please modify variable is_multi_turn and file paths as needed
 ```
