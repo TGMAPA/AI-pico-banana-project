@@ -1,3 +1,4 @@
+from src.config.libraries import *
 
 # General PATHS and env configuration
 
@@ -5,3 +6,5 @@ IO_DATASET_MAP_LOCAL_PATH = "/home/mapa/Documents/Tec/7S/IA-Avanzada/IA-Avanzada
 N_SAMPLES = 1000
 IMAGE_HEIGHTS_MEDIAN = 128
 IMAGE_WIDTHS_MEDIAN = 128
+
+DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
