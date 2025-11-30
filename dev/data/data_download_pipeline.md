@@ -1,5 +1,7 @@
-# Apple Pico-Banana Repo Download (https://github.com/apple/pico-banana-400k/tree/main?tab=readme-ov-file)
-
+# Apple Pico-Banana Repo Download 
+- (https://github.com/apple/pico-banana-400k/tree/main?tab=readme-ov-file)
+  
+Verify file paths in code for local execution.
 ```bash
 # Install awscli if you don't have it (https://aws.amazon.com/cli/)
 # Download Open Images packed files 
@@ -27,31 +29,27 @@ python map_openimage_url_to_local.py #please modify variable is_multi_turn and f
 ```
 
 # Filter desired Categories from sft_with_local_source_image_path.jsonl
-
+Verify file paths in code for local execution.
 ```bash
 python filter_editCats_sft.py
 ```
 
 # Filter train images to delete extra samples and free disk space
-
-```bash
-python filter_raw_train_images.py
-```
-
-# Filter train images to delete extra samples and free disk space
-
+Verify file paths in code for local execution.
 ```bash
 python filter_raw_train_images.py
 ```
 
 # Download Outputs for filtered train samples
-
+Verify file paths in code for local execution.
 ```bash
 python download_edits.py
 ```
 
-# Add local outputs paths with filtered local map (filtered_sft_with_local_source_image_path) and "filtered_dataset_IO_loca.csv" will be created
+# Add local outputs paths with filtered local map 
+- filtered_sft_with_local_source_image_path) and "filtered_dataset_IO_loca.csv" will be created.
 
+Verify file paths in code for local execution.
 ```bash
 python map_localOutputs_to_filtered_local_sft.py
 ```
