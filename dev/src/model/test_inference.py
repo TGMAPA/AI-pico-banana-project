@@ -4,7 +4,7 @@
 from src.model.PicoBanana import PicoBanana 
 from src.config.config import DEVICE, MODEL_SERIALIZED_PATH
 from src.config.libraries import *
-
+import os
 from tqdm import tqdm
 
 
@@ -12,8 +12,8 @@ def main():
 
     # Create model
     model = PicoBanana(
-        batch_size = 4,
-        num_workers = 4,
+        batch_size = 8,
+        num_workers = 16,
         train_proportion = 0.8,
         val_proportion = 0.8 
     )
@@ -49,8 +49,12 @@ def main():
         ax.axis('off')
 
     plt.tight_layout()
-    plt.show()
-
+    # plt.show()
+    output_dir = "Inference_Outputs"
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, "inference_grid.png")
+    plt.savefig(output_path, dpi=300)
+    plt.close(fig)
     print("Inference phase finished...")
 
 if __name__ == "__main__":
