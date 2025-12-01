@@ -5,10 +5,17 @@ from src.config.libraries import *
 # SelfAttention Component Implementation
 class SelfAttention(nn.Module):
     # Class constructor
-    def __init__(self, n_channels, n_groups, num_heads):
+    def __init__(self, n_channels, n_groups = 8, num_heads = 4):
         super().__init__()
-
+        
+        # Number of channels produced by some conv filters
         self.n_channels = n_channels
+        
+        '''
+        num_groups controls how the channels are divided for normalization.
+        GroupNorm is used instead of BatchNorm because it is stable even with 
+        small batch sizes, which is common in diffusion models.
+        '''
         self.n_groups = n_groups
 
         # Normalize block

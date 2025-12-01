@@ -33,7 +33,7 @@ class Resnet(nn.Module):
             self.skip_conv = nn.Identity()
         
 
-    def forward(self, x, time_embedding):
+    def forward(self, x: torch.Tensor, time_embedding):
         residual = x
         
         # First block: norm -> silu -> conv1 
