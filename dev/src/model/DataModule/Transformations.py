@@ -11,7 +11,7 @@ crop_width = int(np.floor(IMAGE_WIDTHS_MEDIAN * 0.8))
 # Transformación de entrenamiento
 train_transform = transforms.Compose([
     transforms.Resize((IMAGE_HEIGHTS_MEDIAN, IMAGE_WIDTHS_MEDIAN)),
-    transforms.RandomCrop((crop_height, crop_width)),
+    #transforms.RandomCrop((crop_height, crop_width)),
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])

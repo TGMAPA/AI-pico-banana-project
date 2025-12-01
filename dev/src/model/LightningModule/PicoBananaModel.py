@@ -3,7 +3,8 @@
 # Import required modules and libraries
 from src.model.DiffusionFwd.DiffusionFwd import DiffusionFwd
 from src.config.libraries import *
-from src.config.config import DEVICE
+from src.config.config import DEVICE, N_T_STEPS, BETA_0, BETA_N
+
 
 # Picobanana Model Condiguration with Lightning tools
 class PicobananaModel(L.LightningModule):
@@ -19,11 +20,15 @@ class PicobananaModel(L.LightningModule):
         self.loss_fn = nn.MSELoss()
 
         # Diffusion Forward Process to add noise
-        self.difussionForward = DiffusionFwd()
+        self.difussionForward = DiffusionFwd(
+            N_T_steps = N_T_STEPS, 
+            beta_0 = BETA_0, 
+            beta_N = BETA_N
+        )
 
     # Compute Model Forward
-    def forward(self, x):
-        noise_prediction = self.model(x)
+    def forward(self, x, t):
+        noise_prediction = self.model(x, t)
         return noise_prediction
     
     # Compute DDPM steps 
@@ -36,7 +41,7 @@ class PicobananaModel(L.LightningModule):
         t = torch.randint(0, self.num_timesteps, (images.shape[0],)).to(DEVICE)
     
         # Add noise with Diffusion Forward process
-        noisy_images = self.difussionForward.add_noise(images, noise, t)
+        noisy_images = self.difussionForward.createNoise(images, noise, t)
 
         # --- Get prediction
         # Get noise prediction with model for actual batch

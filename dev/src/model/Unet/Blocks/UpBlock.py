@@ -12,7 +12,7 @@ class UpBlock(nn.Module):
         super().__init__()
 
         # Up sampling
-        self.up_sample_conv = nn.ConvTranspose2d(in_channels // 2, in_channels // 2, kernel_size = 4, stride = 2, padding = 1) if up_sample else nn.Identity()
+        self.up_sample_conv = nn.ConvTranspose2d(in_channels, in_channels // 2, kernel_size = 4, stride = 2, padding = 1) if up_sample else nn.Identity()
 
         # Resnet Block
         self.resnet = Resnet(in_channels, out_channels, time_embedding_dimension)

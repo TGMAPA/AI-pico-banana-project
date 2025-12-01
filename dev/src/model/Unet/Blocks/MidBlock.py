@@ -18,7 +18,7 @@ class MidBlock(nn.Module):
         self.attn   = SelfAttention(out_channels, num_heads=n_heads) if use_attention else nn.Identity()
 
         # Second Resnet Block
-        self.resnet2 = Resnet(in_channels, out_channels, time_embedding_dimension)
+        self.resnet2 = Resnet(out_channels, out_channels, time_embedding_dimension)
 
     # Execute forward step
     def forward(self, x: torch.Tensor, time_embedding):
