@@ -38,6 +38,12 @@ class Unet(nn.Module):
         # Up sample boolean array
         self.up_sample = list(reversed(self.down_sample)) # [False, True, True]
 
+        # Time embedder
+        self.time_embedder = TimeEmbedding(
+            time_embedding_dimension=self.time_embedding_dimension,
+            fc_out_dimension=self.time_embedding_dimension
+        )
+
         # Initial Convolutional layer 
         # Map the raw image to a higher-dimensional feature space
         # so the U-Net can extract rich spatial representations.
@@ -82,8 +88,7 @@ class Unet(nn.Module):
     def forward(self, x: torch.Tensor, time_steps ):
 
         # Time projections
-        TimeEmbedder = TimeEmbedding(time_embedding_dimension=self.time_embedding_dimension)
-        time_embedding = TimeEmbedder.forward(time_steps=time_steps)
+        time_embedding = self.time_embedder(time_steps=time_steps)
 
         # -- Apply Initial Convolutional Layer
         out = self.conv_in(x)

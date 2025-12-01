@@ -14,6 +14,11 @@ dev/data/open-image-mapping-resources/source-info/preference.jsonl
 dev/data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv
 dev/data/open-image-mapping-resources/source-info/filtered_sft_with_local_source_image_path.csv
 
+# Model serialized Objects and model checkpoints
+dev/src/model/ModelCheckpoints
+dev/src/model/SerializedObjects
+dev/src/model/TrainingLogs
+
 # General files
 *.zip
 *.vscode
