@@ -60,7 +60,8 @@ class PicoBanana:
         # Instance picobanana lightning model
         picobananaModel = PicobananaModel(
             model = unet,
-            learning_rate = learning_rate
+            learning_rate = learning_rate,
+            num_timesteps = N_T_STEPS
         )
 
         self.model = picobananaModel
@@ -122,7 +123,8 @@ class PicoBanana:
         # Instance picobanana lightning model
         picobananaModel = PicobananaModel(
             model = unet,
-            learning_rate = self.learning_rate
+            learning_rate = self.learning_rate,
+            num_timesteps = N_T_STEPS
         )
         # Load weights from serialized object
         picobananaModel.load_state_dict(torch.load(serialized_object_path))

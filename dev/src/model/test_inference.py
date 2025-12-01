@@ -20,7 +20,7 @@ def main():
 
     # Save model
     model.load_model( MODEL_SERIALIZED_PATH)
-    print("Model was correctly loaded ...")
+    print("Model was correctly loaded from " +MODEL_SERIALIZED_PATH+ " ...")
 
     # Inference
     generated_imgs = []

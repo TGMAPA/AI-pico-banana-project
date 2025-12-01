@@ -9,8 +9,8 @@ def main():
 
     # Create model
     model = PicoBanana(
-        batch_size = 8,
-        num_workers = 16,
+        batch_size = 4,
+        num_workers = 32,
         train_proportion = 0.8,
         val_proportion = 0.8 
     )
