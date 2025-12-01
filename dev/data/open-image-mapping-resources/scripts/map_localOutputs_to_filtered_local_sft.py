@@ -2,9 +2,9 @@ import pandas as pd
 import os
 
 # -------- CONFIGURAR
-CSV_INPUT = "/home/mapa/Documents/Tec/7S/IA-Avanzada/IA-Avanzada-2/FinalProject/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_sft_with_local_source_image_path.csv"
-CSV_OUTPUT = "/home/mapa/Documents/Tec/7S/IA-Avanzada/IA-Avanzada-2/FinalProject/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv"
-OUTPUT_FOLDER = "/home/mapa/Documents/Tec/7S/IA-Avanzada/IA-Avanzada-2/FinalProject/AI-pico-banana-project/dev/data/openimage_source_images/output"   # carpeta local donde están las imágenes
+CSV_INPUT = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_sft_with_local_source_image_path.csv"
+CSV_OUTPUT = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv"
+OUTPUT_FOLDER = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/openimage_source_images/output"   # carpeta local donde están las imágenes
 
 # --------------------------------
 

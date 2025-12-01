@@ -69,7 +69,7 @@ class PicoBanana:
         trainer = L.Trainer(
             max_epochs = epochs,
             logger = CSVLogger(TRAININGLOGS_DIR_PATH, name = MODEL_NAME),
-            callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=3),
+            callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=5),
                        ModelCheckpoint(monitor="val_loss", mode="min", save_top_k=1, dirpath=CHECKPOINTS_DIR_PATH, filename="best_model")],
             accelerator = "gpu",
             devices=1,

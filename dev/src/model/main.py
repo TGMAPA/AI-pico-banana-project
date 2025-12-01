@@ -9,8 +9,8 @@ def main():
 
     # Create model
     model = PicoBanana(
-        batch_size = 4,
-        num_workers = 4,
+        batch_size = 8,
+        num_workers = 16,
         train_proportion = 0.8,
         val_proportion = 0.8 
     )
@@ -19,7 +19,7 @@ def main():
 
     # Train model
     model.train(
-        epochs = 2,
+        epochs = 200,
         learning_rate = 1e-4
     )
 
