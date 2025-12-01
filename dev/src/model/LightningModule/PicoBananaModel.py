@@ -1,92 +1,77 @@
 # Pico banana model
 
+# Import required modules and libraries
+from src.model.DiffusionFwd.DiffusionFwd import DiffusionFwd
 from src.config.libraries import *
+from src.config.config import DEVICE
 
+# Picobanana Model Condiguration with Lightning tools
 class PicobananaModel(L.LightningModule):
-    def __init__(self, model, learning_rate=1e-4):
+    # Class constructor
+    def __init__(self, model, learning_rate=1e-4, num_timesteps=1000):
         super().__init__()
-        # Atributos generales
+        # General properties
         self.learning_rate = learning_rate
         self.model = model
+        self.num_timesteps = num_timesteps
 
-        # Función de pérdida para cada tarea
-        self.loss_fn = nn.CrossEntropyLoss()
+        # Define loss function
+        self.loss_fn = nn.MSELoss()
 
-        # # Atributos para almacenar las métricas calculadas para el accuracy para el conjunto de entrenamiento
-        # self.train_model_acc = torchmetrics.Accuracy(task="multiclass", num_classes=N_CAR_MODEL_CLASSES)
-        # self.train_color_acc = torchmetrics.Accuracy(task="multiclass", num_classes=N_CAR_COLOR_CLASSES)
+        # Diffusion Forward Process to add noise
+        self.difussionForward = DiffusionFwd()
 
-        # # Atributos para almacenar las métricas calculadas para el accuracy para el conjunto de validación
-        # self.val_model_acc = torchmetrics.Accuracy(task="multiclass", num_classes=N_CAR_MODEL_CLASSES)
-        # self.val_color_acc = torchmetrics.Accuracy(task="multiclass", num_classes=N_CAR_COLOR_CLASSES)
-
+    # Compute Model Forward
     def forward(self, x):
-        model_out, color_out = self.model(x)
-        return model_out, color_out
-
-    def training_step(self, batch, batch_idx):
-        # Obtener batch del dataloader del conjunto de entrenamiento
-        features, model_labels, color_labels = batch
-
-        # Obtener una predicción para el batch actual 
-        model_out, color_out = self(features)
-
-        # Calcular el error para cada una de las categorías deseadas (modelo y color del auto)
-        loss_model = self.loss_fn(model_out, model_labels)
-        loss_color = self.loss_fn(color_out, color_labels)
-
-        # El error general del batch se considera como la suma de los dos anteriores
-        loss = loss_model + loss_color
-
-        # Loggear pérdidas
-        self.log("train_model_loss", loss_model, on_epoch=True, logger=True)
-        self.log("train_color_loss", loss_color, on_epoch=True, logger=True)
-        self.log("train_loss", loss, on_epoch=True, prog_bar=True, logger=True)
-
-        # Guardar el calculo del Accuracy del entrenamiento
-        model_preds = torch.argmax(model_out, dim=1)
-        color_preds = torch.argmax(color_out, dim=1)
-
-        self.train_model_acc(model_preds, model_labels)
-        self.train_color_acc(color_preds, color_labels)
-
-        self.log("train_model_acc", self.train_model_acc, on_epoch=True, logger=True)
-        self.log("train_color_acc", self.train_color_acc, on_epoch=True, logger=True)
-
-        return loss
-
-    def validation_step(self, batch, batch_idx):
-        # Obtener batch del dataloader del conjunto de validación
-        features, model_labels, color_labels = batch
-
-        # Obtener una predicción para el batch actual 
-        model_out, color_out = self(features)
-
-        # Calcular el error para cada una de las categorías deseadas (modelo y color del auto)
-        loss_model = self.loss_fn(model_out, model_labels)
-        loss_color = self.loss_fn(color_out, color_labels)
-
-        # El error general del batch se considera como la suma de los dos anteriores
-        loss = loss_model + loss_color
-
-        # Loggear pérdidas
-        self.log("val_model_loss", loss_model, on_epoch=True, logger=True)
-        self.log("val_color_loss", loss_color, on_epoch=True, logger=True)
-        self.log("val_loss", loss, on_epoch=True, prog_bar=True, logger=True)
-
-        # Guardar el calculo del Accuracy de validación
-        model_preds = torch.argmax(model_out, dim=1)
-        color_preds = torch.argmax(color_out, dim=1)
-
-        self.val_model_acc(model_preds, model_labels)
-        self.val_color_acc(color_preds, color_labels)
-
-        self.log("val_model_acc", self.val_model_acc, on_epoch=True, logger=True)
-        self.log("val_color_acc", self.val_color_acc, on_epoch=True, logger=True)
+        noise_prediction = self.model(x)
+        return noise_prediction
+    
+    # Compute DDPM steps 
+    def shared_step(self, batch):
+        images = batch
         
-        return loss
+        # --- Direct Difussion Forward (Noise adition)
+        # Generate noise and timestaps
+        noise = torch.randn_like(images).to(DEVICE)
+        t = torch.randint(0, self.num_timesteps, (images.shape[0],)).to(DEVICE)
+    
+        # Add noise with Diffusion Forward process
+        noisy_images = self.difussionForward.add_noise(images, noise, t)
 
+        # --- Get prediction
+        # Get noise prediction with model for actual batch
+        noise_prediction = self(noisy_images, t)
+
+        # --- Loss
+        # Compute error between original noise distribution and model's noise prediction for actual batch
+        loss_model = self.loss_fn(noise_prediction, noise)
+
+        return loss_model
+    
+    # Execute training step and store loss 
+    def training_step(self, batch, batch_idx):
+        loss_model = self.shared_step(batch)
+        
+        # Log computed loss
+        self.log("train_loss", loss_model, on_epoch=True, logger=True)
+        
+        # --- Accuracy Computation --- Pending
+
+        return loss_model
+    
+    # Execute training step and store loss 
+    def validation_step(self, batch, batch_idx):
+        loss_model = self.shared_step(batch)
+        
+        # Log computed loss
+        self.log("val_loss", loss_model, on_epoch=True, logger=True)
+        
+        # --- Accuracy Computation --- Pending
+
+        return loss_model
+
+    # Configure Model Optimizer
     def configure_optimizers(self):
-        # Configurar optimizador como 
-        optimizer = torch.optim.RMSprop(self.parameters(), lr=self.learning_rate)
+        # Configure optimizer as ADAM with specified learning rate
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
         return optimizer
