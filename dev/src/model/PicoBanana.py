@@ -131,6 +131,27 @@ class PicoBanana:
         self.model = picobananaModel
 
         self.model.to(DEVICE)
+    
+    def load_from_checkpoint(self, checkpoint_path, learning_rate=1e-4):
+        # 1. Crear el modelo base (Unet)
+        unet = Unet(image_channels=IMAGE_CHANNELS)
+
+        # 2. Cargar el LightningModule completo desde el checkpoint
+        picobananaModel = PicobananaModel.load_from_checkpoint(
+            checkpoint_path,
+            model=unet,
+            learning_rate=learning_rate
+        )
+
+        # 3. Guardarlo como el modelo actual
+        self.model = picobananaModel
+
+        torch.save(self.model.state_dict(), MODEL_SERIALIZED_PATH)
+
+        # 4. Mandarlo a GPU si aplica
+        self.model.to(DEVICE)
+
+        print(f"Model loaded form checkpoint path : {checkpoint_path}")
 
     # Method for saving model as serialized object
     def save_model(self, serialized_object_path_destination = MODEL_SERIALIZED_PATH):
