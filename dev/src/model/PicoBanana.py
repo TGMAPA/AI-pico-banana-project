@@ -102,7 +102,7 @@ class PicoBanana:
         
 
         with torch.no_grad():
-            for t in reversed(range(200)):
+            for t in reversed(range(N_T_STEPS)):
                 noise_pred = self.model(xt, torch.as_tensor(t).unsqueeze(0).to(DEVICE))
                 xt, x0 = difusion_reversed.reverse_timestep(xt, noise_pred, torch.as_tensor(t).to(DEVICE))
 

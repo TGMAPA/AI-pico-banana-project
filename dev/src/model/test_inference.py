@@ -24,13 +24,13 @@ def main():
 
     # Inference
     generated_imgs = []
-    for i in tqdm(range(4)):
+    for i in tqdm(range(9)):
         xt = model.inference()      # (1, C, 64, 64) en [0,1]
         img = xt[0].cpu().numpy()         # (C, 64, 64)
         img = (img * 255).clip(0, 255).astype(np.uint8)  # [0,1] -> [0,255] uint8
         generated_imgs.append(img)
 
-    fig, axes = plt.subplots(2, 2, figsize=(5, 5))
+    fig, axes = plt.subplots(3, 3, figsize=(5, 5))
 
     for i, ax in enumerate(axes.flat):
         if i >= len(generated_imgs):
