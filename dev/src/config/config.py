@@ -1,4 +1,5 @@
 from src.config.libraries import *
+import os 
 
 MODEL_NAME = "picobanana_model"
 
@@ -6,7 +7,12 @@ MODEL_NAME = "picobanana_model"
 IO_DATASET_MAP_LOCAL_PATH = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv"
 CHECKPOINTS_DIR_PATH = "src/model/ModelCheckpoints/"
 TRAININGLOGS_DIR_PATH = "src/model/TrainingLogs"
-MODEL_SERIALIZED_PATH = "src/model/SerializedObjects/" + MODEL_NAME + "_weights.pth"
+
+# Dir path for model serialized objects storage, verify dir existance
+MODEL_SERIALIZED_DIR_PATH = "src/model/SerializedObjects"
+os.makedirs(MODEL_SERIALIZED_DIR_PATH, exist_ok=True)
+
+MODEL_SERIALIZED_PATH = MODEL_SERIALIZED_DIR_PATH + "/" + MODEL_NAME + "_weights.pth"
 
 
 # Image parameters obtained from "dev/data/exploration-scripts/image_explore.ipynb"
