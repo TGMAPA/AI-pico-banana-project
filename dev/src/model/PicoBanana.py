@@ -5,6 +5,7 @@ from src.model.DataModule import Transformations
 from src.config.config import IO_DATASET_MAP_LOCAL_PATH, DEVICE, N_T_STEPS, BETA_0, BETA_N
 from src.config.config import  CHECKPOINTS_DIR_PATH, TRAININGLOGS_DIR_PATH, MODEL_NAME, MODEL_SERIALIZED_PATH
 from src.config.config import IMAGE_HEIGHTS_MEDIAN, IMAGE_WIDTHS_MEDIAN, IMAGE_CHANNELS
+from src.config.config import BATCH_SIZE, NUM_WORKERS, TRAIN_PROPORTION, VAL_PROPORTION, SEED, EARLY_STOPPING_PATIENCE, TRAINER_ACCELERATOR, TRAINER_PRECISION
 from src.model.Unet.Unet import Unet
 from src.model.LightningModule.PicoBananaModel import PicobananaModel
 
@@ -71,11 +72,11 @@ class PicoBanana:
         trainer = L.Trainer(
             max_epochs = epochs,
             logger = CSVLogger(TRAININGLOGS_DIR_PATH, name = MODEL_NAME),
-            callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=15),
-                       ModelCheckpoint(monitor="val_loss", mode="min", save_top_k=1, dirpath=CHECKPOINTS_DIR_PATH, filename="best_model")],
-            accelerator = "gpu",
+            callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=EARLY_STOPPING_PATIENCE),
+                       ModelCheckpoint(monitor="val_loss", mode="min", save_top_k=1, dirpath=CHECKPOINTS_DIR_PATH, filename="best_model_"+MODEL_NAME)],
+            accelerator = TRAINER_ACCELERATOR,
             devices=1,
-            precision= "16-mixed"
+            precision= TRAINER_PRECISION
         )
 
         # Execute model's training step

@@ -1,36 +1,57 @@
 from src.config.libraries import *
-import os 
 
-MODEL_NAME = "picobanana_model"
+# Image crop transform measures
+IMAGE_HEIGHTS_MEDIAN = 80
+IMAGE_WIDTHS_MEDIAN = 80
+IMAGE_CHANNELS = 3
+
+# -- Image parameters obtained from "dev/data/exploration-scripts/image_explore.ipynb"
+# Numbers of samples used for dataset split
+N_SAMPLES = 21896
+
+# Train parameters
+BATCH_SIZE = 4
+NUM_WORKERS = 24
+TRAIN_PROPORTION = 0.95
+VAL_PROPORTION = 0.95
+N_EPOCHS = 200
+LEARNING_RATE = 1e-4
+SEED = 42
+EARLY_STOPPING_PATIENCE = 200
+TRAINER_ACCELERATOR = 'gpu'
+TRAINER_PRECISION = "16-mixed"
+
+
+# DDPM Parameters
+N_T_STEPS = 500
+BETA_0 = 1e-4
+BETA_N = 0.02
+
+VARIABLE_ATTN = False
+
+# Model name
+MODEL_NAME = "picobanana_model_"+str(IMAGE_HEIGHTS_MEDIAN)+"_"+str(IMAGE_WIDTHS_MEDIAN)+"_"+str(N_T_STEPS)+"steps_"+str(N_SAMPLES)+"samples_"+"varSelfattn_"+str(VARIABLE_ATTN)
 
 # General PATHS and env configuration
-IO_DATASET_MAP_LOCAL_PATH = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv"
+IO_DATASET_MAP_LOCAL_PATH = "data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv"
 CHECKPOINTS_DIR_PATH = "src/model/ModelCheckpoints/"
 TRAININGLOGS_DIR_PATH = "src/model/TrainingLogs"
+os.makedirs(TRAININGLOGS_DIR_PATH, exist_ok = True)
+METRICS_PLOTS_OUTPUT_DIR_PATH = "src/model/Metrics_Plots"
+os.makedirs(METRICS_PLOTS_OUTPUT_DIR_PATH, exist_ok = True)
+METRICS_MODEL_VERSION_TO_PLOT = 30
 
 # Dir path for model serialized objects storage, verify dir existance
 MODEL_SERIALIZED_DIR_PATH = "src/model/SerializedObjects"
 os.makedirs(MODEL_SERIALIZED_DIR_PATH, exist_ok=True)
 
+# Model serialized object "pth" path
 MODEL_SERIALIZED_PATH = MODEL_SERIALIZED_DIR_PATH + "/" + MODEL_NAME + "_weights.pth"
-
-
-# Image parameters obtained from "dev/data/exploration-scripts/image_explore.ipynb"
-#N_SAMPLES = int(21896 * .1)
-N_SAMPLES = 21896
-
-IMAGE_SCALE_FACTOR = 0.10
-# IMAGE_HEIGHTS_MEDIAN = int(768 * IMAGE_SCALE_FACTOR)
-# IMAGE_WIDTHS_MEDIAN = int(1024 * IMAGE_SCALE_FACTOR)
-IMAGE_HEIGHTS_MEDIAN = 80
-IMAGE_WIDTHS_MEDIAN = 80
-IMAGE_CHANNELS = 3
 
 # Device configuration
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# DDPM Parameters
-#N_T_STEPS = 1000
-N_T_STEPS = 500
-BETA_0 = 1e-4
-BETA_N = 0.02
+# Test Inference Parameters
+N_INFERENCES_2_EXEC = 9
+OUTPUT_INFERENCES_DIR = "src/"+MODEL_NAME+"_OUTPUT_INFERENCES"
+os.makedirs(OUTPUT_INFERENCES_DIR, exist_ok=True)

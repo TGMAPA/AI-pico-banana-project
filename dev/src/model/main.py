@@ -1,7 +1,8 @@
 # main
 
 from src.model.PicoBanana import PicoBanana 
-from src.config.config import DEVICE, MODEL_SERIALIZED_PATH
+from src.config.config import DEVICE, MODEL_SERIALIZED_PATH, BATCH_SIZE, NUM_WORKERS, TRAIN_PROPORTION, VAL_PROPORTION
+from src.config.config import N_EPOCHS, LEARNING_RATE
 from src.config.libraries import *
 
 
@@ -9,18 +10,18 @@ def main():
 
     # Create model
     model = PicoBanana(
-        batch_size = 4,
-        num_workers = 32,
-        train_proportion = 0.8,
-        val_proportion = 0.8 
+        batch_size = BATCH_SIZE,
+        num_workers = NUM_WORKERS,
+        train_proportion = TRAIN_PROPORTION,
+        val_proportion = VAL_PROPORTION
     )
 
     start = time.time()
 
     # Train model
     model.train(
-        epochs = 200,
-        learning_rate = 1e-4
+        epochs = N_EPOCHS,
+        learning_rate = LEARNING_RATE
     )
 
     end = time.time()
