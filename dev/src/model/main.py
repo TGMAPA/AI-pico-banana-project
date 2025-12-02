@@ -1,13 +1,14 @@
-# main
+# == Main for model's training phase
 
+# Import libraries and required modules
 from src.model.PicoBanana import PicoBanana 
-from src.config.config import DEVICE, MODEL_SERIALIZED_PATH, BATCH_SIZE, NUM_WORKERS, TRAIN_PROPORTION, VAL_PROPORTION
+from src.config.config import MODEL_SERIALIZED_PATH, BATCH_SIZE, NUM_WORKERS, TRAIN_PROPORTION, VAL_PROPORTION
 from src.config.config import N_EPOCHS, LEARNING_RATE
 from src.config.libraries import *
 
 
+# Main file for picobanana model training execution
 def main():
-
     # Create model
     model = PicoBanana(
         batch_size = BATCH_SIZE,
@@ -16,6 +17,7 @@ def main():
         val_proportion = VAL_PROPORTION
     )
 
+    # Start time counter
     start = time.time()
 
     # Train model
@@ -24,12 +26,13 @@ def main():
         learning_rate = LEARNING_RATE
     )
 
+    # Stop time counter
     end = time.time()
 
+    # Show execution time
     exec_time_seconds = end - start 
     exec_time_minutes = exec_time_seconds/60 
     exec_time_hrs = exec_time_minutes/60
-
     print("Executión time  | seconds: ", exec_time_seconds, " | minutes: ", exec_time_minutes, " | hrs: ", exec_time_hrs)
 
     # Save model

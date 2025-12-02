@@ -1,17 +1,14 @@
 # Import requiered modules and libraries
 from src.config.libraries import *
-from src.config.config import DEVICE
-
 from src.model.Unet.components.TimeEmbedding import TimeEmbedding
 from src.model.Unet.Blocks.DownBlock import DownBlock
 from src.model.Unet.Blocks.MidBlock import MidBlock
 from src.model.Unet.Blocks.UpBlock import UpBlock 
-
 from src.config.config import N_ATTN_HEADS_ENCODER, N_ATTN_HEADS_DECODER, N_ATTN_HEADS_MIDDLE
 
 """
-torch nn.Module con arquitectura Unet + DDPM 
-    - Implementar componentes (time embedding.py, downblock.py, midblock.py y upblock.py)
+torch nn.Module with Unet rquitecture 
+    - Component's (DownBlock.py, MidBlock.py and UpBlock.py)
 """
 class Unet(nn.Module):
     # Class Constructor

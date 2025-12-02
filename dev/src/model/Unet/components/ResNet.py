@@ -1,8 +1,12 @@
 # Resnet Block Component
+
+# Import requiered modules and libraries
 from src.config.libraries import *
+
 
 # ResNet Component Implementation
 class Resnet(nn.Module):
+    # Class Constructor
     def __init__(self, in_channels, out_channels, time_embedding_dimension):
         super().__init__()
 
@@ -32,7 +36,7 @@ class Resnet(nn.Module):
         else:
             self.skip_conv = nn.Identity()
         
-
+    # Execute forward step
     def forward(self, x: torch.Tensor, time_embedding):
         residual = x
         

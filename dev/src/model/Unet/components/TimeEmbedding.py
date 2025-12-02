@@ -26,7 +26,6 @@ class TimeEmbedding(nn.Module):
             nn.Linear(self.time_embedding_dimension, self.fc_out_dimension)
         )
 
-
     # Transform escalar t into expanded time embedding 
     def generate_time_embedding(self, time_steps):
         # Get half of the time_embedding_dimension

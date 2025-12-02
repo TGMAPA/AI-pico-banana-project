@@ -24,7 +24,7 @@ class SelfAttention(nn.Module):
         # Multihead block
         self.multiHeadAttention = nn.MultiheadAttention(embed_dim=self.n_channels, num_heads=num_heads, batch_first=True)
 
-    # Class constructor 
+    # Execute forward step
     def forward(self, x: torch.Tensor):
         # Unpack batch dimensions
         batch, channels, height, width = x.shape
