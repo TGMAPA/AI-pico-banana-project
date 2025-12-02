@@ -1,6 +1,6 @@
 # main
 
-from src.model.PicoBanana import PicoBanana 
+from src.model.CIFAR10_DDPM import CIFAR10_DDPM
 from src.config.config import DEVICE, MODEL_SERIALIZED_PATH
 from src.config.libraries import *
 
@@ -8,12 +8,9 @@ from src.config.libraries import *
 def main():
 
     # Create model
-    model = PicoBanana(
-        batch_size = 4,
-        num_workers = 32,
-        train_proportion = 0.8,
-        val_proportion = 0.8,
-        seed= 42
+    model = CIFAR10_DDPM(
+        batch_size = 16,
+        num_workers = 16,
     )
 
     start = time.time()

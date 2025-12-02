@@ -6,5 +6,6 @@ import torch
 import lightning as L
 import torchvision
 from torch import nn
+from torchvision import datasets
 import torchmetrics
 import time
