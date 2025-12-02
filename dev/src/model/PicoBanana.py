@@ -51,26 +51,27 @@ class PicoBanana:
         ):
 
         self.learning_rate = learning_rate
+        
+        if self.model is None:
+            # Unet instance
+            unet = Unet(
+                image_channels = image_channels
+            )
 
-        # Unet instance
-        unet = Unet(
-            image_channels = image_channels
-        )
+            # Instance picobanana lightning model
+            picobananaModel = PicobananaModel(
+                model = unet,
+                learning_rate = learning_rate,
+                num_timesteps = N_T_STEPS
+            )
 
-        # Instance picobanana lightning model
-        picobananaModel = PicobananaModel(
-            model = unet,
-            learning_rate = learning_rate,
-            num_timesteps = N_T_STEPS
-        )
-
-        self.model = picobananaModel
+            self.model = picobananaModel
 
         # Create picobanana's trainer
         trainer = L.Trainer(
             max_epochs = epochs,
             logger = CSVLogger(TRAININGLOGS_DIR_PATH, name = MODEL_NAME),
-            callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=5),
+            callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=15),
                        ModelCheckpoint(monitor="val_loss", mode="min", save_top_k=1, dirpath=CHECKPOINTS_DIR_PATH, filename="best_model")],
             accelerator = "gpu",
             devices=1,
@@ -137,12 +138,14 @@ class PicoBanana:
     def load_from_checkpoint(self, checkpoint_path, learning_rate=1e-4):
         # 1. Crear el modelo base (Unet)
         unet = Unet(image_channels=IMAGE_CHANNELS)
+            
+        self.learning_rate = learning_rate
 
         # 2. Cargar el LightningModule completo desde el checkpoint
         picobananaModel = PicobananaModel.load_from_checkpoint(
             checkpoint_path,
             model=unet,
-            learning_rate=learning_rate
+            learning_rate=self.learning_rate
         )
 
         # 3. Guardarlo como el modelo actual
