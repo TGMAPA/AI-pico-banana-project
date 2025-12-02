@@ -1,6 +1,6 @@
 from torch.utils.data import Dataset
 
-from src.config.config import IO_DATASET_MAP_LOCAL_PATH
+from src.config.config import IO_DATASET_MAP_LOCAL_PATH, INPUT_IMAGES_CSV_INDEX
 from src.config.libraries import *
 
 class PicoBananaDataset(Dataset):
@@ -13,7 +13,7 @@ class PicoBananaDataset(Dataset):
 
     def __getitem__(self, idx):
         # Extraer ruta de la imagen de Input
-        sample_input_img_path = self.df.iloc[idx, 6]
+        sample_input_img_path = self.df.iloc[idx, INPUT_IMAGES_CSV_INDEX]
         sample_input_image = Image.open(sample_input_img_path).convert("RGB")
 
         # Extraer ruta de la imagen de Output
