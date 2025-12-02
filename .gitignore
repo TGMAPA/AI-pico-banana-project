@@ -3,6 +3,9 @@ dev/data/openimage_source_images/input/train_0
 dev/data/openimage_source_images/input/train_1
 dev/data/openimage_source_images/output
 dev/data/openimage_source_images/input
+dev/data/cifar-10-batches-py
+dev/data/cifar-10-python.tar.gz
+
 
 # Resources maps and csv
 dev/data/open-image-mapping-resources/source-info/train-images-boxable-with-rotation.csv
@@ -26,3 +29,4 @@ __pycache__/
 *.jsonl
 *.zip
 *.tar
+*.tar.gz
