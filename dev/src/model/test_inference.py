@@ -2,20 +2,19 @@
 
 # Load libraries
 from src.model.PicoBanana import PicoBanana 
-from src.config.config import DEVICE, MODEL_SERIALIZED_PATH
+from src.config.config import DEVICE, MODEL_SERIALIZED_PATH, MODEL_NAME, N_INFERENCES_2_EXEC, OUTPUT_INFERENCES_DIR
+from src.config.config import BATCH_SIZE, NUM_WORKERS, TRAIN_PROPORTION, VAL_PROPORTION
 from src.config.libraries import *
-import os
-from tqdm import tqdm
 
 
 def main():
 
     # Create model
     model = PicoBanana(
-        batch_size = 8,
-        num_workers = 16,
-        train_proportion = 0.8,
-        val_proportion = 0.8 
+        batch_size = BATCH_SIZE,
+        num_workers = NUM_WORKERS,
+        train_proportion = TRAIN_PROPORTION,
+        val_proportion = VAL_PROPORTION
     )
 
     # Save model
@@ -24,13 +23,13 @@ def main():
 
     # Inference
     generated_imgs = []
-    for i in tqdm(range(9)):
+    for i in tqdm(range(N_INFERENCES_2_EXEC)):
         xt = model.inference()      # (1, C, 64, 64) en [0,1]
         img = xt[0].cpu().numpy()         # (C, 64, 64)
         img = (img * 255).clip(0, 255).astype(np.uint8)  # [0,1] -> [0,255] uint8
         generated_imgs.append(img)
 
-    fig, axes = plt.subplots(3, 3, figsize=(5, 5))
+    fig, axes = plt.subplots(3, 3, figsize=(10, 10))
 
     for i, ax in enumerate(axes.flat):
         if i >= len(generated_imgs):
@@ -50,12 +49,12 @@ def main():
 
     plt.tight_layout()
     # plt.show()
-    output_dir = "Inference_Outputs"
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "inference_grid.png")
+    
+    
+    output_path = os.path.join(OUTPUT_INFERENCES_DIR, MODEL_NAME + "inference_"+str(N_INFERENCES_2_EXEC)+"_grid.png")
     plt.savefig(output_path, dpi=300)
     plt.close(fig)
-    print("Inference phase finished...")
+    print("Inference phase finished, grid saves in "+output_path+ "...")
 
 if __name__ == "__main__":
     main()

@@ -2,10 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+from src.config.config import MODEL_NAME, METRICS_PLOTS_OUTPUT_DIR_PATH, METRICS_MODEL_VERSION_TO_PLOT
+
 # --- CONFIG ---
-CSV_PATH = "TrainingLogs/picobanana_model/version_9/metrics.csv"  
-OUTPUT_DIR = "Metrics_Plots"
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+CSV_PATH = "src/model/TrainingLogs/"+MODEL_NAME+"/version_"+str(METRICS_MODEL_VERSION_TO_PLOT)+"/metrics.csv"  
 
 print(f"Loading metrics from {CSV_PATH} ...")
 df = pd.read_csv(CSV_PATH)
@@ -23,35 +23,44 @@ df = df.dropna(how='all')
 print("\nUsed columns for plots:")
 print(df.columns)
 
-# --- FUNCIÓN PARA GRAFICAR UNA COLUMNA ---
-def plot_metric(column_name, ylabel=None):
-    if column_name not in df.columns:
+# --- GRAFICAR TRAIN + VAL LOSS EN UN SOLO PLOT ---
+def plot_train_val_losses():
+    # train_cols = ["train_loss_step", "train_loss_epoch"]
+    train_cols = ["train_loss_epoch"]
+    val_cols = ["val_loss"]
+
+    # Filtrar columnas existentes
+    train_cols = [c for c in train_cols if c in df.columns]
+    val_cols = [c for c in val_cols if c in df.columns]
+
+    if not train_cols and not val_cols:
+        print("No train/val loss columns found.")
         return
 
-    series = df[column_name].dropna()
-    if len(series) == 0:
-        return
-    
     plt.figure(figsize=(8, 5))
-    plt.plot(series.index, series.values)
-    plt.title(column_name)
-    plt.xlabel("Index (steps/epochs depending on metric)")
-    plt.ylabel(ylabel if ylabel else column_name)
-    plt.grid(True)
 
-    out_path = os.path.join(OUTPUT_DIR, f"{column_name}.png")
+    # Graficar train losses
+    for col in train_cols:
+        plt.plot(df[col].dropna().values, label=col)
+
+    # Graficar val losses
+    for col in val_cols:
+        plt.plot(df[col].dropna().values, label=col)
+
+    plt.title(MODEL_NAME + " | Train vs Val Loss")
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.grid(True)
+    plt.legend()
+
+    out_path = os.path.join(METRICS_PLOTS_OUTPUT_DIR_PATH, MODEL_NAME+"_train_val_loss.png")
     plt.savefig(out_path, dpi=150)
     plt.close()
-    print(f"Generated: {out_path}")
+    print(f"Generated combined plot: {out_path}")
 
-# --- GRAFICAR MÉTRICAS PRINCIPALES ---
-for col in ["train_loss_step", "train_loss_epoch", "val_loss"]:
-    plot_metric(col)
 
-# --- GRAFICAR TODAS LAS MÉTRICAS NUMÉRICAS ---
-numeric_cols = df.select_dtypes(include=["float", "int"]).columns
-for col in numeric_cols:
-    plot_metric(col)
+# Llamar a la nueva función
+plot_train_val_losses()
 
 print("\nPlot phase finished...")
 
