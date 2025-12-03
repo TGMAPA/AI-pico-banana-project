@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Map Open Images URLs (single-turn or multi-turn) to local Open Images images.
 
@@ -11,21 +9,22 @@ Supports two input formats:
      {"files": [{"id": "original_input_image", "url": "https://farm6.staticflickr.com/..._o.jpg"}, ...]}
 """
 
+# Import modules
 import os
 import csv
 import json
 from tqdm import tqdm
 
-base_path = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/"
+base_path = "data/open-image-mapping-resources/source-info/"
 
 is_multi_turn = False  # <-- Set to True for multi-turn format
 metadata_csv = base_path + "train-images-boxable-with-rotation.csv"
 jsonl_in = base_path + "sft.jsonl"  # or preference.jsonl or multi-turn.jsonl;change to your actual file path
 jsonl_out = base_path + "sft_with_local_source_image_path.jsonl" # change to your actual desired file path
-image_root = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/openimage_source_images/input"
+image_root = "data/openimage_source_images/input"
 
 
-print("📘 Loading metadata mapping (URL → ImageID)...")
+print("Loading metadata mapping (URL → ImageID)...")
 url_to_id = {}
 with open(metadata_csv, "r") as f:
     reader = csv.DictReader(f)
@@ -33,24 +32,24 @@ with open(metadata_csv, "r") as f:
         url = row["OriginalURL"].strip()
         img_id = row["ImageID"].strip()
         url_to_id[url] = img_id
-print(f"✅ Loaded {len(url_to_id):,} entries from metadata CSV")
+print(f"Loaded {len(url_to_id):,} entries from metadata CSV")
 
 
-print(f"📂 Indexing local .jpg images under {image_root}...")
+print(f"Indexing local .jpg images under {image_root}...")
 local_id_to_path = {}
 for root, _, files in tqdm(os.walk(image_root), desc="Scanning subfolders"):
     for file in files:
         if file.lower().endswith(".jpg"):
             image_id = os.path.splitext(file)[0]
             local_id_to_path[image_id] = os.path.join(root, file)
-print(f"✅ Indexed {len(local_id_to_path):,} local image files")
+print(f"Indexed {len(local_id_to_path):,} local image files")
 
 
 count_matched = 0
 count_url_not_found = 0
 count_file_missing = 0
 
-print("🔗 Mapping input URLs to local files...")
+print("Mapping input URLs to local files...")
 with open(jsonl_in, "r") as fin, open(jsonl_out, "w") as fout:
     for line in tqdm(fin, desc="Processing JSONL"):
         if not line.strip():

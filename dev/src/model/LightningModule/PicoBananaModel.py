@@ -1,4 +1,4 @@
-# Pico banana model
+# == Pico banana model as lightning Module
 
 # Import required modules and libraries
 from src.model.DiffusionFwd.DiffusionFwd import DiffusionFwd
