@@ -1,63 +1,64 @@
+"""
+This file will delete output images that arent in the filteres local map that will be used.
+The main reason for this is to free space of the current data
+
+"""
+
+# Import modules
 import os
 import csv
 
-# Ruta al CSV que tiene la columna local_input_image
-CSV_PATH = r"/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_sft_with_local_source_image_path.csv"
 
-BASE_IMAGE_PATH = r"/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/openimage_source_images/input/"
+# Csv path where "local_input_image" column is contained (this file should be already filtered)
+CSV_PATH = r"data/open-image-mapping-resources/source-info/filtered_sft_with_local_source_image_path.csv"
 
-# Carpetas donde están las imágenes que quieres depurar
+# Path where input images are located for its proper cleaning
+BASE_IMAGE_PATH = r"data/openimage_source_images/input/"
+
+# Directories where deletion need tu execute recursive search and deletion
 IMAGE_DIRS = [
     BASE_IMAGE_PATH + r"train_0",
     BASE_IMAGE_PATH + r"train_1",
 ]
 
-DRY_RUN = False 
+# Image formats to search
 VALID_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 
-
+# Function that reads csv and extract every input path names contained in the "local_input_image" column
 def load_valid_filenames_from_csv(csv_path):
-    """
-    Lee el CSV y extrae un conjunto de NOMBRES DE ARCHIVO (basename)
-    presentes en la columna local_input_image.
-    """
     valid_names = set()
 
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         if "local_input_image" not in reader.fieldnames:
-            raise ValueError("La columna 'local_input_image' no existe en el CSV.")
+            raise ValueError("Column 'local_input_image' doesnt exits")
 
         for row in reader:
             path = row.get("local_input_image", "")
             if not path:
                 continue
 
-            # Nos quedamos con el basename: 00072da456114f3b.jpg
+            # Get file basename
             basename = os.path.basename(path)
             if basename:
                 valid_names.add(basename)
 
     return valid_names
 
-
-def clean_image_dirs(image_dirs, valid_names, dry_run=True):
-    """
-    Recorre las carpetas de imágenes y borra cualquier archivo cuyo basename
-    NO esté en valid_names.
-    """
+# Function that iterates over every input image folder and deletes every unvalid file
+def clean_image_dirs(image_dirs, valid_names):
     total_files = 0
     to_delete = 0
 
     for base_dir in image_dirs:
-        print(f"\nRevisando carpeta: {base_dir}")
+        print(f"\nChecking directory : {base_dir}")
 
         for root, _, files in os.walk(base_dir):
             for fname in files:
                 total_files += 1
                 ext = os.path.splitext(fname)[1].lower()
 
-                # Solo nos interesan imágenes
+                # Only get images
                 if ext not in VALID_EXTS:
                     continue
 
@@ -68,11 +69,11 @@ def clean_image_dirs(image_dirs, valid_names, dry_run=True):
                     try:
                         os.remove(full_path)
                     except Exception as e:
-                        print(f"[ERROR] No se pudo borrar {full_path}: {e}")
+                        print(f"[ERROR] Image couldnt be deleted {full_path}: {e}")
 
 if __name__ == "__main__":
-    print(f"Cargando nombres válidos desde: {CSV_PATH}")
+    print(f"Loading valid file names from : {CSV_PATH}")
     valid_filenames = load_valid_filenames_from_csv(CSV_PATH)
-    print(f"Total de nombres de imagen referenciados en CSV: {len(valid_filenames)}")
+    print(f"Total files from csv : {len(valid_filenames)}")
 
-    clean_image_dirs(IMAGE_DIRS, valid_filenames, dry_run=DRY_RUN)
+    clean_image_dirs(IMAGE_DIRS, valid_filenames)
