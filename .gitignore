@@ -5,6 +5,8 @@ dev/data/openimage_source_images/output
 dev/data/openimage_source_images/input
 dev/data/cifar-10-batches-py
 dev/data/cifar-10-python.tar.gz
+dev/data/celeba/*
+dev/data/celeba/img_align_celeba/
 
 
 # Resources maps and csv

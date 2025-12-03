@@ -6,7 +6,7 @@ from src.config.libraries import *
 
 # Device configuration
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-torch.set_float32_matmul_precision('high')
+torch.set_float32_matmul_precision('medium')
 
 # -- General dataset and data (images) params obtained from "dev/data/exploration-scripts/image_explore.ipynb"
 # Image crop transform measures
@@ -15,7 +15,7 @@ IMAGE_WIDTHS_MEDIAN = 84
 IMAGE_CHANNELS = 3
 
 # Numbers of samples used for dataset split
-N_SAMPLES = 202,599
+N_SAMPLES = 202599
 
 
 # -- Model's Training Phase Parameters
@@ -26,7 +26,7 @@ VAL_PROPORTION = 0.95
 N_EPOCHS = 200
 LEARNING_RATE = 1e-4
 SEED = 42
-EARLY_STOPPING_PATIENCE = 40
+EARLY_STOPPING_PATIENCE = 25
 TRAINER_ACCELERATOR = 'gpu'
 TRAINER_PRECISION = "16-mixed"
 
@@ -38,9 +38,6 @@ BETA_0 = 1e-4
 BETA_N = 0.02
 
 # N_Self_attention_heads per UNET Block
-# N_ATTN_HEADS_ENCODER = 4
-# N_ATTN_HEADS_MIDDLE = 2
-# N_ATTN_HEADS_DECODER = 10
 N_ATTN_HEADS_ENCODER = 4
 N_ATTN_HEADS_MIDDLE = 4
 N_ATTN_HEADS_DECODER = 4
@@ -51,13 +48,13 @@ N_ATTN_HEADS_DECODER = 4
 VARIABLE_ATTN = False
 
 # Model name
-MODEL_NAME = "picobanana_model_"+str(IMAGE_HEIGHTS_MEDIAN)+"_"+str(IMAGE_WIDTHS_MEDIAN)+"_"+str(N_T_STEPS)+"steps_"+str(N_SAMPLES)+"samples_"+"varSelfattn_"+str(VARIABLE_ATTN)
+MODEL_NAME = "CALEBA_MODEL_"+str(IMAGE_HEIGHTS_MEDIAN)+"_"+str(IMAGE_WIDTHS_MEDIAN)+"_"+str(N_T_STEPS)+"steps_"+str(N_SAMPLES)+"samples_"+"varSelfattn_"+str(VARIABLE_ATTN)
 
 
 # -- Input Data CSV Params
 # File from where data input paths will be extracted for model's train phase
 #IO_DATASET_MAP_LOCAL_PATH = "data/open-image-mapping-resources/source-info/dataset_with_local_source_image_path.csv"
-IO_DATASET_MAP_LOCAL_PATH = "data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv"
+IO_DATASET_MAP_LOCAL_PATH = "data/celeba/annotations_celeba.csv"
 
 # Csv column from where image input paths will be extraced
 INPUT_IMAGES_CSV_INDEX = "local_input_image"

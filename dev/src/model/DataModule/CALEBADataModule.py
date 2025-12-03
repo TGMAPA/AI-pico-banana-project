@@ -1,52 +1,73 @@
 from torch.utils.data import DataLoader
-
+from src.model.DataModule.CALEBADataset import CALEBADataset
 from src.config.libraries import *
 from src.config.config import N_SAMPLES
 
 # Data Module para crear dataloaders
 class CALEBDataModule(L.LightningDataModule):
-    def __init__(self, batch_size=64, num_workers=0, train_transform=None, test_transform=None):
+    # Class constructor
+    def __init__(
+            self, 
+            annotations_file, 
+            batch_size=64, 
+            num_workers=0, 
+            train_transform=None, 
+            test_transform=None, 
+            train_proportion = 0.8, 
+            val_proportion = 0.8, 
+            seed = 42
+            ):
         super().__init__()
-        # Atributos generales
+
+        # General class properties
         self.batch_size = batch_size
+        self.annotations_file = annotations_file
         self.num_workers = num_workers
+        self.seed = seed
 
         # Transform Pipelines 
         self.train_transform = train_transform
         self.test_transform = test_transform
-        
-        # Crear dataloaders
+
+        # Split proportions
+        self.val_proportion = val_proportion
+        self.train_proportion = train_proportion
+
+        # Create dataloaders
         self.prepare_data()
         self.setup()
 
     def setup(self, stage=None):
+        # Compute correct split's dimensions
+        train_size = int(N_SAMPLES * self.train_proportion)
+        test_size = N_SAMPLES - train_size
+        val_size = int(train_size * (1 - self.val_proportion))
+        train_size = train_size - val_size
 
-        # Crear datasets independientes con sus transformaciones
-        self.train = datasets.CelebA(
-                                    root="data",
-                                    train=True,
-                                    download=True,
-                                    transform=self.train_transform,
-                                    target_transform=None
-                                )
-       
-        self.valid = datasets.CelebA(
-                                    root="data",
-                                    train=False,
-                                    download=True,
-                                    transform=self.test_transform,
-                                    target_transform=None
-                                )
-        self.test = datasets.CelebA(
-                                    root="data",
-                                    train=False,
-                                    download=True,
-                                    transform=self.test_transform,
-                                    target_transform=None
-                                )
+        print(f"Split sizes -> Train: {train_size}, Val: {val_size}, Test: {test_size}")
+
+        # Use data generator with specific seed
+        generator = torch.Generator().manual_seed(self.seed)
+
+        # Execute random split with computed index
+        train_idx, val_idx, test_idx = torch.utils.data.random_split(
+            range(N_SAMPLES),
+            [train_size, val_size, test_size],
+            generator=generator
+        )
+        
+        # Create datasets with its transformation
+        self.train = CALEBADataset(self.annotations_file, transform=self.train_transform)
+        self.valid = CALEBADataset(self.annotations_file, transform=self.test_transform)
+        self.test = CALEBADataset(self.annotations_file, transform=self.test_transform)
+
+        # Subsets extraction according to computed random splits
+        self.train = torch.utils.data.Subset(self.train, train_idx.indices)
+        self.valid = torch.utils.data.Subset(self.valid, val_idx.indices)
+        self.test = torch.utils.data.Subset(self.test, test_idx.indices)
 
     def train_dataloader(self):
-        # Dataloader para el conjunto de entrenamiento
+        # Training dataloader
         train_loader = DataLoader(
             dataset=self.train,
             batch_size=self.batch_size,
@@ -57,7 +78,7 @@ class CALEBDataModule(L.LightningDataModule):
         return train_loader
 
     def val_dataloader(self):
-        # Dataloader para el conjunto de validación
+        # Validation dataloader
         valid_loader = DataLoader(
             dataset=self.valid,
             batch_size=self.batch_size,
@@ -68,7 +89,7 @@ class CALEBDataModule(L.LightningDataModule):
         return valid_loader
 
     def test_dataloader(self):
-        # Dataloader para el conjunto de prueba
+        # Testing dataloader
         test_loader = DataLoader(
             dataset=self.test,
             batch_size=self.batch_size,
