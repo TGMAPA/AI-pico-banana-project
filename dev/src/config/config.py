@@ -6,15 +6,17 @@ from src.config.libraries import *
 
 # Device configuration
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+torch.set_float32_matmul_precision('high')
 
 # -- General dataset and data (images) params obtained from "dev/data/exploration-scripts/image_explore.ipynb"
 # Image crop transform measures
-IMAGE_HEIGHTS_MEDIAN = 80
-IMAGE_WIDTHS_MEDIAN = 80
+IMAGE_HEIGHTS_MEDIAN = 84
+IMAGE_WIDTHS_MEDIAN = 84
 IMAGE_CHANNELS = 3
 
 # Numbers of samples used for dataset split
-N_SAMPLES = 21896
+N_SAMPLES = 257730
+
 
 # -- Model's Training Phase Parameters
 BATCH_SIZE = 4
@@ -24,8 +26,8 @@ VAL_PROPORTION = 0.95
 N_EPOCHS = 200
 LEARNING_RATE = 1e-4
 SEED = 42
-EARLY_STOPPING_PATIENCE = 25
-TRAINER_ACCELERATOR = 'gpu' if DEVICE == 'cuda' else 'cpu'
+EARLY_STOPPING_PATIENCE = 40
+TRAINER_ACCELERATOR = 'gpu'
 TRAINER_PRECISION = "16-mixed"
 
 
@@ -58,8 +60,7 @@ MODEL_NAME = "picobanana_model_"+str(IMAGE_HEIGHTS_MEDIAN)+"_"+str(IMAGE_WIDTHS_
 IO_DATASET_MAP_LOCAL_PATH = "data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv"
 
 # Csv column from where image input paths will be extraced
-#INPUT_IMAGES_CSV_INDEX = -1
-INPUT_IMAGES_CSV_INDEX = 6
+INPUT_IMAGES_CSV_INDEX = "local_input_image"
 
 
 # -- Lightning paths and params

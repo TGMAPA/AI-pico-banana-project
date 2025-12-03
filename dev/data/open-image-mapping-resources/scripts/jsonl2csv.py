@@ -9,10 +9,10 @@ import json
 
 
 # Jsonl non filtered file path with mapped inputs
-SFT_WITH_LOCAL_SOURCE_IMAGE_PATH_JSONL_PATH = "../source-info/sft_with_local_source_image_path.jsonl"
+SFT_WITH_LOCAL_SOURCE_IMAGE_PATH_JSONL_PATH = "data/open-image-mapping-resources/source-info/sft_with_local_source_image_path.jsonl"
 
 # CSV file created path
-SFT_WITH_LOCAL_SOURCE_IMAGE_PATH_CSV_PATH = "../source-info/dataset_with_local_source_image_path.csv"
+SFT_WITH_LOCAL_SOURCE_IMAGE_PATH_CSV_PATH = "data/open-image-mapping-resources/source-info/dataset_with_local_source_image_path.csv"
 
 """
     Convert a JSONL (JSON Lines) file to CSV and save it.

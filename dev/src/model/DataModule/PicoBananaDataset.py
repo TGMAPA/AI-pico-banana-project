@@ -19,7 +19,7 @@ class PicoBananaDataset(Dataset):
     # Get next iterator item
     def __getitem__(self, idx):
         # Extract input image path
-        sample_input_img_path = self.df.iloc[idx, INPUT_IMAGES_CSV_INDEX]
+        sample_input_img_path = self.df.loc[idx, INPUT_IMAGES_CSV_INDEX]
         sample_input_image = Image.open(sample_input_img_path).convert("RGB")
 
         # Apply transformation
