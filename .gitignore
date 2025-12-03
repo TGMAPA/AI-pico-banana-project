@@ -7,7 +7,8 @@ dev/data/cifar-10-batches-py
 dev/data/cifar-10-python.tar.gz
 dev/data/celeba/*
 dev/data/celeba/img_align_celeba/
-
+dev/data/celeb/*
+dev/data/celeb/img_align_celeba
 
 # Resources maps and csv
 dev/data/open-image-mapping-resources/source-info/train-images-boxable-with-rotation.csv
