@@ -56,7 +56,7 @@ def execute_inference():
     plt.tight_layout()
     
     # Store figure
-    output_path = os.path.join(OUTPUT_INFERENCES_DIR, MODEL_NAME + "inference_"+str(N_INFERENCES_2_EXEC)+"_grid.png")
+    output_path = os.path.join(OUTPUT_INFERENCES_DIR, MODEL_NAME + "_inference_"+str(N_INFERENCES_2_EXEC)+"_grid.png")
     plt.savefig(output_path, dpi=300)
     plt.close(fig)
     print("Inference phase finished, grid saves in "+output_path+ "...")

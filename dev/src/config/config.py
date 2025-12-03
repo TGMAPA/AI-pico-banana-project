@@ -19,7 +19,7 @@ N_SAMPLES = 257730
 
 
 # -- Model's Training Phase Parameters
-BATCH_SIZE = 4
+BATCH_SIZE = 16
 NUM_WORKERS = 24
 TRAIN_PROPORTION = 0.95
 VAL_PROPORTION = 0.95
@@ -74,7 +74,7 @@ METRICS_PLOTS_OUTPUT_DIR_PATH = "src/model/Metrics_Plots"
 os.makedirs(METRICS_PLOTS_OUTPUT_DIR_PATH, exist_ok = True)
 
 # Lightning logger: model's version to plot metrics.csv
-METRICS_MODEL_VERSION_TO_PLOT = 30
+METRICS_MODEL_VERSION_TO_PLOT = 0
 
 
 # -- Model serialization paths
