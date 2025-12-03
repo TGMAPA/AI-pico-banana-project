@@ -15,7 +15,7 @@ IMAGE_WIDTHS_MEDIAN = 84
 IMAGE_CHANNELS = 3
 
 # Numbers of samples used for dataset split
-N_SAMPLES = 257730
+N_SAMPLES = 60000
 
 
 # -- Model's Training Phase Parameters
