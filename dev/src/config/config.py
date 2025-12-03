@@ -54,7 +54,9 @@ MODEL_NAME = "picobanana_model_"+str(IMAGE_HEIGHTS_MEDIAN)+"_"+str(IMAGE_WIDTHS_
 
 # -- Input Data CSV Params
 # File from where data input paths will be extracted for model's train phase
-IO_DATASET_MAP_LOCAL_PATH = "data/open-image-mapping-resources/source-info/dataset_with_local_source_image_path.csv"
+#IO_DATASET_MAP_LOCAL_PATH = "data/open-image-mapping-resources/source-info/dataset_with_local_source_image_path.csv"
+IO_DATASET_MAP_LOCAL_PATH = "data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv"
+
 # Csv column from where image input paths will be extraced
 #INPUT_IMAGES_CSV_INDEX = -1
 INPUT_IMAGES_CSV_INDEX = 6
