@@ -1,10 +1,10 @@
 # Import libraries and required modules
 from src.config.libraries import *
-from src.model.DataModule.CIFAR10DataModule import CIFAR10DataModule
+from src.model.DataModule.CALEBADataModule import CALEBDataModule
 from src.model.DataModule import Transformations
-from src.config.config import DEVICE, N_T_STEPS, BETA_0, BETA_N
+from src.config.config import DEVICE, N_T_STEPS, BETA_0, BETA_N, TRAINER_PRECISION, TRAINER_ACCELERATOR
 from src.config.config import  CHECKPOINTS_DIR_PATH, TRAININGLOGS_DIR_PATH, MODEL_NAME, MODEL_SERIALIZED_PATH
-from src.config.config import IMAGE_HEIGHTS_MEDIAN, IMAGE_WIDTHS_MEDIAN, IMAGE_CHANNELS
+from src.config.config import IMAGE_HEIGHTS_MEDIAN, IMAGE_WIDTHS_MEDIAN, IMAGE_CHANNELS, EARLY_STOPPING_PATIENCE
 from src.model.Unet.Unet import Unet
 from src.model.LightningModule.PicoBananaModel import PicobananaModel
 from src.model.DiffusionReversed.DiffusionReversed import DiffusionReversed
@@ -13,8 +13,8 @@ from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 
 
-# CIFAR 10 model implementation
-class CIFAR10_DDPM:
+# CALEBA 10 model implementation
+class CALEBA_DDPM:
     def __init__(
             self,
             batch_size = 32, 
@@ -26,7 +26,7 @@ class CIFAR10_DDPM:
         self.learning_rate = None
 
         # Create DataModule
-        self.dm  = CIFAR10DataModule(
+        self.dm  = CALEBDataModule(
             batch_size=batch_size, 
             num_workers=num_workers, 
             train_transform= Transformations.train_transform, 
@@ -62,11 +62,11 @@ class CIFAR10_DDPM:
         trainer = L.Trainer(
             max_epochs = epochs,
             logger = CSVLogger(TRAININGLOGS_DIR_PATH, name = MODEL_NAME),
-            callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=15),
-                       ModelCheckpoint(monitor="val_loss", mode="min", save_top_k=1, dirpath=CHECKPOINTS_DIR_PATH, filename="best_model")],
-            accelerator = "gpu",
+            callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=EARLY_STOPPING_PATIENCE),
+                       ModelCheckpoint(monitor="val_loss", mode="min", save_top_k=1, dirpath=CHECKPOINTS_DIR_PATH, filename="best_model_"+MODEL_NAME)],
+            accelerator = TRAINER_ACCELERATOR,
             devices=1,
-            precision= "16-mixed"
+            precision= TRAINER_PRECISION
         )
 
         # Execute model's training step
@@ -80,7 +80,7 @@ class CIFAR10_DDPM:
     def inference(self):
 
         assert self.model is not None, "Training Phase is missing for model's inference mode" 
-
+        
         difusion_reversed = DiffusionReversed(
             N_T_steps = N_T_STEPS,
             beta_0 = BETA_0,
@@ -92,7 +92,6 @@ class CIFAR10_DDPM:
         # Generate noise sample from N(0,1)
         xt = torch.randn(1, IMAGE_CHANNELS, IMAGE_HEIGHTS_MEDIAN, IMAGE_WIDTHS_MEDIAN).to(DEVICE)
         
-
         with torch.no_grad():
             for t in reversed(range(N_T_STEPS)):
                 noise_pred = self.model(xt, torch.as_tensor(t).unsqueeze(0).to(DEVICE))
@@ -101,7 +100,6 @@ class CIFAR10_DDPM:
         # Bring result to [0, 1] for visualization
         xt = torch.clamp(xt, -1., 1.).detach().to(DEVICE)
         xt = (xt + 1) / 2.0  # [-1,1] -> [0,1]
-
 
         return xt
         
@@ -124,7 +122,7 @@ class CIFAR10_DDPM:
         self.model = picobananaModel
 
         self.model.to(DEVICE)
-    
+
     # Method for loading model form lightning chekpoint (for posterior retraining)
     def load_from_checkpoint(self, checkpoint_path, learning_rate=1e-4):
         # Create base Unet model

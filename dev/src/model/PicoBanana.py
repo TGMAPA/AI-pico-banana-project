@@ -187,7 +187,7 @@ class PicoBanana:
         plt.axis("off")
         plt.title("Training batch")
 
-        # Crear torch grid
+        # Create torch grid
         grid = torchvision.utils.make_grid(
             images[:n],   
             nrow=int(n * 0.35),       
