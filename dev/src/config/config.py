@@ -24,7 +24,7 @@ VAL_PROPORTION = 0.95
 N_EPOCHS = 200
 LEARNING_RATE = 1e-4
 SEED = 42
-EARLY_STOPPING_PATIENCE = 25
+EARLY_STOPPING_PATIENCE = 40
 TRAINER_ACCELERATOR = 'gpu' if DEVICE == 'cuda' else 'cpu'
 TRAINER_PRECISION = "16-mixed"
 
@@ -46,7 +46,7 @@ N_ATTN_HEADS_DECODER = 10
 
 # -- Model's NAME
 # Bool: existent variation in n self attentions per unet block 
-VARIABLE_ATTN = False
+VARIABLE_ATTN = True
 
 # Model name
 MODEL_NAME = "picobanana_model_"+str(IMAGE_HEIGHTS_MEDIAN)+"_"+str(IMAGE_WIDTHS_MEDIAN)+"_"+str(N_T_STEPS)+"steps_"+str(N_SAMPLES)+"samples_"+"varSelfattn_"+str(VARIABLE_ATTN)
