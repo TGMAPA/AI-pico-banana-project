@@ -1,26 +1,28 @@
+# Import libraries and required modules
 from torch.utils.data import Dataset
-
-from src.config.config import IO_DATASET_MAP_LOCAL_PATH
+from src.config.config import IO_DATASET_MAP_LOCAL_PATH, INPUT_IMAGES_CSV_INDEX
 from src.config.libraries import *
 
+
+# Pico banana dataset loader
 class PicoBananaDataset(Dataset):
+    # Class constructor
     def __init__(self, annotations_file = IO_DATASET_MAP_LOCAL_PATH, transform=None):
+        # Annotation file as pandas df
         self.df = pd.read_csv(annotations_file)
         self.transform = transform
 
+    # Get dataset n_samples
     def __len__(self):
         return len(self.df)
 
+    # Get next iterator item
     def __getitem__(self, idx):
-        # Extraer ruta de la imagen de Input
-        sample_input_img_path = self.df.iloc[idx, 6]
+        # Extract input image path
+        sample_input_img_path = self.df.iloc[idx, INPUT_IMAGES_CSV_INDEX]
         sample_input_image = Image.open(sample_input_img_path).convert("RGB")
 
-        # Extraer ruta de la imagen de Output
-        #sample_output_img_path = self.df.iloc[idx, 7]
-        #sample_ouput_image = Image.open(sample_output_img_path).convert("RGB")
-
-        # APlicar transformacion
+        # Apply transformation
         if self.transform:
             sample_input_image = self.transform(sample_input_image)
 

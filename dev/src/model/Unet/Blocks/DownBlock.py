@@ -1,6 +1,5 @@
 # Import requiered modules and libraries
 from src.config.libraries import *
-
 from src.model.Unet.components.ResNet import Resnet
 from src.model.Unet.components.SelfAttention import SelfAttention
 

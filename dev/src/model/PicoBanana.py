@@ -1,22 +1,22 @@
+# Import libraries and required modules
 from src.config.libraries import *
-
 from src.model.DataModule.PicoBananaDataModule import PicoBananaDataModule
 from src.model.DataModule import Transformations
 from src.config.config import IO_DATASET_MAP_LOCAL_PATH, DEVICE, N_T_STEPS, BETA_0, BETA_N
 from src.config.config import  CHECKPOINTS_DIR_PATH, TRAININGLOGS_DIR_PATH, MODEL_NAME, MODEL_SERIALIZED_PATH
 from src.config.config import IMAGE_HEIGHTS_MEDIAN, IMAGE_WIDTHS_MEDIAN, IMAGE_CHANNELS
-from src.config.config import BATCH_SIZE, NUM_WORKERS, TRAIN_PROPORTION, VAL_PROPORTION, SEED, EARLY_STOPPING_PATIENCE, TRAINER_ACCELERATOR, TRAINER_PRECISION
+from src.config.config import EARLY_STOPPING_PATIENCE, TRAINER_ACCELERATOR, TRAINER_PRECISION, METRICS_PLOTS_OUTPUT_DIR_PATH
 from src.model.Unet.Unet import Unet
 from src.model.LightningModule.PicoBananaModel import PicobananaModel
-
 from src.model.DiffusionReversed.DiffusionReversed import DiffusionReversed
 
+# Import lightning tools
 from lightning.pytorch.loggers import CSVLogger
 from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 
 
-
+# Picobanana main class implementation 
 class PicoBanana:
     def __init__(
             self,
@@ -27,8 +27,8 @@ class PicoBanana:
             seed = 42
         ):
 
+        # General class properties
         self.model = None
-
         self.learning_rate = None
 
         # Create DataModule
@@ -53,6 +53,7 @@ class PicoBanana:
 
         self.learning_rate = learning_rate
         
+        # Create new Model instance if this doesnt exist
         if self.model is None:
             # Unet instance
             unet = Unet(
@@ -88,22 +89,23 @@ class PicoBanana:
 
     # Method for generating new images with trained model
     def inference(self):
-
+        # Verify if there is a model loaded
         assert self.model is not None, "Training Phase is missing for model's inference mode" 
 
-        
+        # Diffusion Reverse class instance for denoising inferences
         difusion_reversed = DiffusionReversed(
             N_T_steps = N_T_STEPS,
             beta_0 = BETA_0,
             beta_N = BETA_N
         )
 
+        # Set model in evaluation mode
         self.model.eval()
 
         # Generate noise sample from N(0,1)
         xt = torch.randn(1, IMAGE_CHANNELS, IMAGE_HEIGHTS_MEDIAN, IMAGE_WIDTHS_MEDIAN).to(DEVICE)
         
-
+        # Compute model's predictions (noise)
         with torch.no_grad():
             for t in reversed(range(N_T_STEPS)):
                 noise_pred = self.model(xt, torch.as_tensor(t).unsqueeze(0).to(DEVICE))
@@ -113,11 +115,11 @@ class PicoBanana:
         xt = torch.clamp(xt, -1., 1.).detach().to(DEVICE)
         xt = (xt + 1) / 2.0  # [-1,1] -> [0,1]
 
-
         return xt
         
     # Method for loading pretrained picobanana model
     def load_model(self, serialized_object_path = MODEL_SERIALIZED_PATH):
+        # Create Unet instance
         unet = Unet(
             image_channels = IMAGE_CHANNELS
         )
@@ -128,36 +130,47 @@ class PicoBanana:
             learning_rate = self.learning_rate,
             num_timesteps = N_T_STEPS
         )
+
         # Load weights from serialized object
         picobananaModel.load_state_dict(torch.load(serialized_object_path))
 
         # Assign Loaded model
         self.model = picobananaModel
 
+        # Send model to proper device
         self.model.to(DEVICE)
+
+        return True
     
+    # Method for loading model form lightning chekpoint (for posterior retraining)
     def load_from_checkpoint(self, checkpoint_path, learning_rate=1e-4):
-        # 1. Crear el modelo base (Unet)
-        unet = Unet(image_channels=IMAGE_CHANNELS)
-            
+        # Create base Unet model
+        unet = Unet(
+            image_channels=IMAGE_CHANNELS
+        )
+
+        # Specify learning rate    
         self.learning_rate = learning_rate
 
-        # 2. Cargar el LightningModule completo desde el checkpoint
+        # Load LightningModule from checkpoint
         picobananaModel = PicobananaModel.load_from_checkpoint(
             checkpoint_path,
             model=unet,
             learning_rate=self.learning_rate
         )
 
-        # 3. Guardarlo como el modelo actual
+        # Set model as actual
         self.model = picobananaModel
 
+        # Save serialized Model as object 
         torch.save(self.model.state_dict(), MODEL_SERIALIZED_PATH)
 
-        # 4. Mandarlo a GPU si aplica
+        # Send Model to proper device
         self.model.to(DEVICE)
 
-        print(f"Model loaded form checkpoint path : {checkpoint_path}")
+        print(f"Model loaded from checkpoint path : {checkpoint_path}")
+
+        return True
 
     # Method for saving model as serialized object
     def save_model(self, serialized_object_path_destination = MODEL_SERIALIZED_PATH):
@@ -165,24 +178,29 @@ class PicoBanana:
         return True
 
     # Method for showing a train dataloader's batch
-    def show_batch(self):
-        # Obtener un batch de entrenamiento para mostrar
+    def show_batch(self, n):
+        # Get traiing batch for visualization
         images = next(iter(self.dm.train_dataloader()))
 
-        # Mostrar 15 imagenes
+        # Show n images
         plt.figure(figsize=(10, 8))
         plt.axis("off")
-        plt.title("Imagenes de Entrenamiento")
+        plt.title("Training batch")
 
         # Crear torch grid
         grid = torchvision.utils.make_grid(
-            images[:15],   
-            nrow=5,       
+            images[:n],   
+            nrow=int(n * 0.35),       
             padding=2,
             pad_value=1.0,
             normalize=True
         )
 
-        # Convertir arreglos al formato correcto para mostrarse
+        # Tranform tensors to arrays correct format for plt visualization
         plt.imshow(np.transpose(grid, (1, 2, 0)))
         plt.show()
+
+        # Save images
+        out_path = os.path.join(METRICS_PLOTS_OUTPUT_DIR_PATH, MODEL_NAME+"training_batch_grid.png")
+        plt.savefig(out_path, dpi=150)
+        plt.close()

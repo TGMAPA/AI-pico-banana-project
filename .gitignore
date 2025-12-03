@@ -10,6 +10,7 @@ dev/data/open-image-mapping-resources/source-info/dataset_with_local_source_imag
 dev/data/open-image-mapping-resources/source-info/sft_with_local_source_image_path.jsonl
 dev/data/open-image-mapping-resources/source-info/sft.jsonl
 dev/data/open-image-mapping-resources/source-info/preference.jsonl
+dev/data/open-image-mapping-resources/source-info/dataset_with_local_source_image_path.csv
 
 # Local maps
 dev/data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv

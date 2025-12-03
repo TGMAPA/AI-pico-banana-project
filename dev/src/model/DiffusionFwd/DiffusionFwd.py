@@ -1,9 +1,9 @@
-# Import libraries
+# Import libraries and modules
 from src.config.libraries import *
+
 
 # Forward diffusion formula as in paper DDPM 
 # x_t = sqrt(alpha_product_acum) * x_0  +  sqrt(1 - alpha_product_acum) * noise
-
 class DiffusionFwd:
     def __init__(self, N_T_steps = 1000, beta_0 = 1e-4, beta_N = 0.02):
         # Define betas for each t steps increasing by N_T_Steps 
