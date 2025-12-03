@@ -10,12 +10,12 @@ torch.set_float32_matmul_precision('high')
 
 # -- General dataset and data (images) params obtained from "dev/data/exploration-scripts/image_explore.ipynb"
 # Image crop transform measures
-IMAGE_HEIGHTS_MEDIAN = 84
-IMAGE_WIDTHS_MEDIAN = 84
+IMAGE_HEIGHTS_MEDIAN = 80
+IMAGE_WIDTHS_MEDIAN = 80
 IMAGE_CHANNELS = 3
 
 # Numbers of samples used for dataset split
-N_SAMPLES = 257730
+N_SAMPLES = 21896
 
 
 # -- Model's Training Phase Parameters
@@ -38,9 +38,6 @@ BETA_0 = 1e-4
 BETA_N = 0.02
 
 # N_Self_attention_heads per UNET Block
-# N_ATTN_HEADS_ENCODER = 4
-# N_ATTN_HEADS_MIDDLE = 2
-# N_ATTN_HEADS_DECODER = 10
 N_ATTN_HEADS_ENCODER = 4
 N_ATTN_HEADS_MIDDLE = 4
 N_ATTN_HEADS_DECODER = 4
