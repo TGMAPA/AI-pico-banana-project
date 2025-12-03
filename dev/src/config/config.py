@@ -6,15 +6,17 @@ from src.config.libraries import *
 
 # Device configuration
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+torch.set_float32_matmul_precision('high')
 
 # -- General dataset and data (images) params obtained from "dev/data/exploration-scripts/image_explore.ipynb"
 # Image crop transform measures
-IMAGE_HEIGHTS_MEDIAN = 80
-IMAGE_WIDTHS_MEDIAN = 80
+IMAGE_HEIGHTS_MEDIAN = 84
+IMAGE_WIDTHS_MEDIAN = 84
 IMAGE_CHANNELS = 3
 
 # Numbers of samples used for dataset split
 N_SAMPLES = 257730
+
 
 # -- Model's Training Phase Parameters
 BATCH_SIZE = 4
@@ -25,7 +27,7 @@ N_EPOCHS = 200
 LEARNING_RATE = 1e-4
 SEED = 42
 EARLY_STOPPING_PATIENCE = 40
-TRAINER_ACCELERATOR = 'gpu' if DEVICE == 'cuda' else 'cpu'
+TRAINER_ACCELERATOR = 'gpu'
 TRAINER_PRECISION = "16-mixed"
 
 
@@ -37,8 +39,8 @@ BETA_N = 0.02
 
 # N_Self_attention_heads per UNET Block
 N_ATTN_HEADS_ENCODER = 4
-N_ATTN_HEADS_MIDDLE = 2
-N_ATTN_HEADS_DECODER = 10
+N_ATTN_HEADS_MIDDLE = 4
+N_ATTN_HEADS_DECODER = 4
 # N_ATTN_HEADS_ENCODER = 4
 # N_ATTN_HEADS_MIDDLE = 4
 # N_ATTN_HEADS_DECODER = 4
@@ -46,7 +48,7 @@ N_ATTN_HEADS_DECODER = 10
 
 # -- Model's NAME
 # Bool: existent variation in n self attentions per unet block 
-VARIABLE_ATTN = True
+VARIABLE_ATTN = False
 
 # Model name
 MODEL_NAME = "picobanana_model_"+str(IMAGE_HEIGHTS_MEDIAN)+"_"+str(IMAGE_WIDTHS_MEDIAN)+"_"+str(N_T_STEPS)+"steps_"+str(N_SAMPLES)+"samples_"+"varSelfattn_"+str(VARIABLE_ATTN)
@@ -56,7 +58,7 @@ MODEL_NAME = "picobanana_model_"+str(IMAGE_HEIGHTS_MEDIAN)+"_"+str(IMAGE_WIDTHS_
 # File from where data input paths will be extracted for model's train phase
 IO_DATASET_MAP_LOCAL_PATH = "data/open-image-mapping-resources/source-info/dataset_with_local_source_image_path.csv"
 # Csv column from where image input paths will be extraced
-INPUT_IMAGES_CSV_INDEX = -1
+INPUT_IMAGES_CSV_INDEX = "local_input_image"
 
 
 # -- Lightning paths and params
