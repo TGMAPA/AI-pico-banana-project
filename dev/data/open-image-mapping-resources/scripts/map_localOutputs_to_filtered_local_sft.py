@@ -1,28 +1,38 @@
+"""
+This file will get as input the CSV that contains the mapping of local input paths and output online paths. 
+THis output paths will be mapped with the local stored outputs to have the output local path mapped with each dataset 
+(should be already filtered) samples.
+"""
+
+# Import modules
 import pandas as pd
 import os
 
-# -------- CONFIGURAR
-CSV_INPUT = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_sft_with_local_source_image_path.csv"
-CSV_OUTPUT = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv"
-OUTPUT_FOLDER = "/home/picobanana/Documents/project/AI-pico-banana-project/dev/data/openimage_source_images/output"   # carpeta local donde están las imágenes
 
-# --------------------------------
+# input csv map from where this script will be mapping its input images with its new local output path  
+CSV_INPUT = "data/open-image-mapping-resources/source-info/filtered_sft_with_local_source_image_path.csv"
 
-# Leer CSV
+# csv map that will be created and will contained every filtered sample with its local input and output paths (IO)
+CSV_OUTPUT = "data/open-image-mapping-resources/source-info/filtered_dataset_IO_local.csv"
+
+# Local directory that contains output images
+OUTPUT_FOLDER = "data/openimage_source_images/output" 
+
+# Read csv
 df = pd.read_csv(CSV_INPUT)
 
-# Función para crear ruta local
+# Function for creating local path
 def build_local_output_path(path):
     if pd.isna(path):
         return None
     filename = os.path.basename(path)  # 32.png
     return os.path.join(OUTPUT_FOLDER, filename)
 
-# Crear nueva columna
+# Create new column into csv
 df["local_output_image"] = df["output_image"].apply(build_local_output_path)
 
-# Guardar nuevo CSV
+# Save new csv
 df.to_csv(CSV_OUTPUT, index=False)
 
-print("Nueva columna 'local_output_image' agregada correctamente.")
-print(f"Archivo guardado como: {CSV_OUTPUT}")
+print("New column added succesfully: 'local_output_image'.")
+print(f"File saved in : {CSV_OUTPUT}")
