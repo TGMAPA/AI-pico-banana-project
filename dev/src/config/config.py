@@ -10,8 +10,8 @@ torch.set_float32_matmul_precision('medium')
 
 # -- General dataset and data (images) params obtained from "dev/data/exploration-scripts/image_explore.ipynb"
 # Image crop transform measures
-IMAGE_HEIGHTS_MEDIAN = 84
-IMAGE_WIDTHS_MEDIAN = 84
+IMAGE_HEIGHTS_MEDIAN = 76
+IMAGE_WIDTHS_MEDIAN = 76
 IMAGE_CHANNELS = 3
 
 # Numbers of samples used for dataset split
@@ -19,21 +19,21 @@ N_SAMPLES = 202599
 
 
 # -- Model's Training Phase Parameters
-BATCH_SIZE = 4
+BATCH_SIZE = 2
 NUM_WORKERS = 24
 TRAIN_PROPORTION = 0.95
 VAL_PROPORTION = 0.95
 N_EPOCHS = 200
 LEARNING_RATE = 1e-4
 SEED = 42
-EARLY_STOPPING_PATIENCE = 25
+EARLY_STOPPING_PATIENCE = 5
 TRAINER_ACCELERATOR = 'gpu'
 TRAINER_PRECISION = "16-mixed"
 
 
 # -- DDPM Parameters
 # Time embedding's params
-N_T_STEPS = 1000
+N_T_STEPS = 500
 BETA_0 = 1e-4
 BETA_N = 0.02
 
@@ -73,7 +73,7 @@ METRICS_PLOTS_OUTPUT_DIR_PATH = "src/model/Metrics_Plots"
 os.makedirs(METRICS_PLOTS_OUTPUT_DIR_PATH, exist_ok = True)
 
 # Lightning logger: model's version to plot metrics.csv
-METRICS_MODEL_VERSION_TO_PLOT = 30
+METRICS_MODEL_VERSION_TO_PLOT = 0
 
 
 # -- Model serialization paths

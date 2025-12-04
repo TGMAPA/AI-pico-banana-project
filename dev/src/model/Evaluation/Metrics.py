@@ -22,7 +22,7 @@ def plot_metrics():
     df = df.dropna(how='all')
 
     # Set columns to plot
-    train_cols = ["train_loss_epoch"]
+    train_cols = ["train_loss_step"]
     val_cols = ["val_loss"]
 
     # Filter existent columns
