@@ -90,17 +90,3 @@ MODEL_SERIALIZED_PATH = MODEL_SERIALIZED_DIR_PATH + "/" + MODEL_NAME + "_weights
 N_INFERENCES_2_EXEC = 9
 OUTPUT_INFERENCES_DIR = "src/"+MODEL_NAME+"_OUTPUT_INFERENCES"
 os.makedirs(OUTPUT_INFERENCES_DIR, exist_ok=True)
-
-# -------------------------------------------------------------------------------
-
-
-
-
-# ------ Configuration for model training: dev/src/DDPM_UI_FullStack/* ------
-
-
-
-
-
-
-# -------------------------------------------------------------------------------

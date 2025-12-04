@@ -1,481 +1,349 @@
 # DDPM Image Generator
 
-Proyecto completo para desplegar modelos DDPM (Denoising Diffusion Probabilistic Models) con interfaz web.
+A full-stack system for Denoising Diffusion Probabilistic Models (DDPM) featuring dynamic model selection, web-based inference, and comprehensive model training capabilities.
 
-## Estructura del Proyecto
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Technology Stack](#technology-stack)
+- [System Architecture](#system-architecture)
+- [Directory Structure](#directory-structure)
+- [Installation](#installation)
+- [Running the Application](#running-the-application)
+- [Model Integration](#model-integration)
+- [API Reference](#api-reference)
+- [Image Generation Pipeline](#image-generation-pipeline)
+- [Configuration](#configuration)
+- [License](#license)
+- [Contact](#contact)
+
+---
+
+## Project Overview
+
+This project provides a complete infrastructure for developing, deploying, and serving DDPM-based image generation models. The system consists of three primary components:
+
+1. **Model Development Environment**: PyTorch Lightning-based training infrastructure located in `src/model/`
+2. **Backend Server**: Flask REST API with dynamic model loading and inference capabilities
+3. **Frontend Interface**: React-based web application for interactive image generation
+
+The system supports dynamic model selection at runtime, allowing users to switch between different trained models without code modifications.
+
+---
+
+## Features
+
+- **Dynamic Model Selection**: Load and switch between multiple trained models at runtime
+- **Model Validation and Caching**: Automatic model validation with intelligent caching for performance optimization
+- **REST API**: Well-documented HTTP endpoints for model management and image generation
+- **Interactive Web Interface**: Modern React-based UI with real-time generation feedback
+- **Flexible Model Support**: Compatible with PyTorch `.pt` and `.pth` checkpoint formats
+- **GPU Acceleration**: Automatic CUDA detection and utilization when available
+- **Base64 Image Encoding**: Efficient image transfer via JSON responses
+- **CORS-Enabled**: Configured for secure cross-origin requests between frontend and backend
+
+---
+
+## Technology Stack
+
+### Backend
+- **Python**: 3.10+
+- **Flask**: Web framework for REST API
+- **PyTorch**: Deep learning framework
+- **PyTorch Lightning**: Model training and organization
+- **PIL (Pillow)**: Image processing
+- **NumPy**: Numerical operations
+- **Flask-CORS**: Cross-origin resource sharing
+
+### Frontend
+- **React**: 18.2.0
+- **Vite**: 5.0.8 (build tool and dev server)
+- **Tailwind CSS**: 3.4.0 (utility-first styling)
+- **PostCSS**: CSS transformations
+
+### Model Development
+- **PyTorch Lightning**: Training framework
+- **Custom UNet Architecture**: Diffusion model backbone
+- **DataModule Pipeline**: Data loading and preprocessing
+
+---
+
+## System Architecture
 
 ```
-UI-Test/
-├── backend/                # Backend Flask (Python)
-│   ├── app.py
-│   ├── model/
-│   │   ├── ddpm_loader.py
-│   │   ├── ddpm_inference.py
-│   │   └── model.pth       # Coloca tu modelo aquí
-│   ├── utils/
-│   │   └── image_utils.py
-│   ├── requirements.txt
-│   └── README.md
+┌─────────────────────────────────────────────────────────────────┐
+│                      SYSTEM ARCHITECTURE                        │
+└─────────────────────────────────────────────────────────────────┘
+
+┌──────────────────┐      HTTP REST API       ┌──────────────────┐
+│                  │                          │                  │
+│   FRONTEND       │ ──────────────────────>  │    BACKEND       │
+│   React + Vite   │                          │   Flask + PyTorch│
+│   Port: 5173     │ <──────────────────────  │   Port: 5000     │
+│                  │    JSON (base64 image)   │                  │
+└──────────────────┘                          └──────────────────┘
+                                                       │
+                                                       │
+                                              ┌────────▼────────┐
+                                              │ Model Manager   │
+                                              │ - Validation    │
+                                              │ - Caching       │
+                                              │ - Loading       │
+                                              └────────┬────────┘
+                                                       │
+                                              ┌────────▼────────┐
+                                              │ SerializedModels│
+                                              │ - model1.pt     │
+                                              │ - model2.pth    │
+                                              └─────────────────┘
+```
+
+### Request Flow
+
+1. User interacts with React frontend
+2. Frontend sends POST request to `/generate` endpoint
+3. Backend validates model selection and parameters
+4. Model Manager loads requested model (from cache or disk)
+5. DDPM inference engine generates image through denoising process
+6. Image is converted to base64-encoded PNG
+7. JSON response returned to frontend
+8. Frontend decodes and displays image
+
+---
+
+## Directory Structure
+
+```
+dev/
+├── data/                                    # Dataset storage and pipelines
+│   ├── celeba/                             # CelebA dataset
+│   ├── openimage_source_images/            # OpenImages dataset
+│   └── exploration-scripts/                # Data exploration notebooks
 │
-└── frontend/               # Frontend React
-    ├── src/
-    │   ├── App.jsx
-    │   ├── main.jsx
-    │   ├── styles.css
-    │   └── components/
-    │       └── ImageGenerator.jsx
-    ├── package.json
-    ├── vite.config.js
-    ├── tailwind.config.js
-    └── README.md
+├── src/
+│   ├── config/                             # Global configuration
+│   │   ├── config.py                       # Configuration settings
+│   │   └── libraries.py                    # Shared imports
+│   │
+│   ├── model/                              # Model development codebase
+│   │   ├── main.py                         # Training entry point
+│   │   ├── PicoBanana.py                   # Main model definition
+│   │   ├── resume_from_checkpoint.py       # Checkpoint resumption
+│   │   ├── DataModule/                     # Data loading pipeline
+│   │   ├── DiffusionFwd/                   # Forward diffusion process
+│   │   ├── DiffusionReversed/              # Reverse diffusion (denoising)
+│   │   ├── Unet/                           # UNet architecture
+│   │   ├── LightningModule/                # PyTorch Lightning modules
+│   │   ├── Evaluation/                     # Model evaluation utilities
+│   │   ├── Metrics_Plots/                  # Training metrics and visualization
+│   │   ├── ModelCheckpoints/               # Training checkpoints
+│   │   ├── SerializedObjects/              # Serialized artifacts
+│   │   └── TrainingLogs/                   # TensorBoard logs
+│   │
+│   └── DDPM_UI_FullStack/
+│       ├── backend/
+│       │   ├── app.py                      # Flask server entry point
+│       │   ├── requirements.txt            # Python dependencies
+│       │   ├── model/
+│       │   │   ├── model_manager.py        # Model management system
+│       │   │   ├── ddpm_loader.py          # Model loading utilities
+│       │   │   ├── ddpm_inference.py       # Inference engine
+│       │   │   └── SerializedModels/       # Production model storage
+│       │   │       ├── model1.pt
+│       │   │       └── model2.pth
+│       │   └── utils/
+│       │       └── image_utils.py          # Image processing utilities
+│       │
+│       └── frontend/
+│           ├── package.json                # Node.js dependencies
+│           ├── vite.config.js              # Vite configuration
+│           ├── tailwind.config.js          # Tailwind configuration
+│           ├── postcss.config.js           # PostCSS configuration
+│           ├── index.html                  # HTML entry point
+│           └── src/
+│               ├── main.jsx                # React entry point
+│               ├── App.jsx                 # Root component
+│               ├── styles.css              # Global styles
+│               └── components/
+│                   └── ImageGenerator.jsx  # Main UI component
+│
+└── README.md                               # This file
 ```
 
-## Inicio Rápido
+---
 
-### 1. Backend (Flask)
+## Installation
 
+### Prerequisites
+
+- **Python**: 3.10 or higher
+- **Node.js**: 16.x or higher
+- **npm**: 8.x or higher
+- **CUDA** (optional): For GPU acceleration
+
+### Backend Setup
+
+1. Navigate to the project root:
 ```bash
-cd backend
+cd dev/
+```
+
+2. Verify Python dependencies installation:
+```bash
 pip install -r requirements.txt
-python app.py
 ```
 
-El backend estará en: `http://localhost:5000`
+3. Verify installation:
+```bash
+python -c "import torch; print(f'PyTorch {torch.__version__} installed')"
+python -c "import flask; print(f'Flask {flask.__version__} installed')"
+```
 
-### 2. Frontend (React)
+### Frontend Setup
 
-En otra terminal:
+1. Navigate to frontend directory:
+```bash
+cd src/DDPM_UI_FullStack/frontend/
+```
+
+2. Install Node.js dependencies:
+```bash
+npm install
+```
+
+3. Verify installation:
+```bash
+npm list react vite tailwindcss
+```
+
+---
+
+## Running the Application
+
+### Backend Server
+
+Execute from the project root (`dev/`):
 
 ```bash
-cd frontend
-npm install
+python -m src.DDPM_UI_FullStack.backend.app
+```
+
+Expected output:
+```
+2025-12-04 01:32:44,110 - __main__ - INFO - DDPM Image Generator - Initializing...
+2025-12-04 01:32:44,110 - __main__ - INFO - ============================================================
+
+GPU detected: NVIDIA GeForce RTX 4060 Laptop GPU
+2025-12-04 01:32:44,136 - src.DDPM_UI_FullStack.backend.model.model_manager - INFO - Model directory initialized: /dev/src/DDPM_UI_FullStack/backend/model/SerializedModels
+2025-12-04 01:32:44,136 - src.DDPM_UI_FullStack.backend.model.model_manager - INFO - Cache enabled: True
+2025-12-04 01:32:44,136 - src.DDPM_UI_FullStack.backend.model.model_manager - INFO - Device: cuda
+2025-12-04 01:32:44,136 - __main__ - INFO - Found 4 models:
+2025-12-04 01:32:44,136 - __main__ - INFO -    - CALEBA_model_76_76_500steps_202599samples_varSelfattn_False_weights (24.57MB)
+2025-12-04 01:32:44,136 - __main__ - INFO -    - cifar10_model_84_84_1000steps_60000samples_varSelfattn_False_weights (24.56MB)
+2025-12-04 01:32:44,136 - __main__ - INFO -    - picobanana_model_64_64_1000steps_21896samples_varSelfattn_False_weights (24.56MB)
+2025-12-04 01:32:44,136 - __main__ - INFO -    - picobanana_model_80_80_500steps_21896samples_varSelfattn_False_weights (24.56MB)
+2025-12-04 01:32:44,136 - __main__ - INFO - ============================================================
+2025-12-04 01:32:44,136 - __main__ - INFO - Server ready to receive requests
+2025-12-04 01:32:44,136 - __main__ - INFO - ============================================================
+
+
+Flask server running at: http://localhost:5000
+Available endpoints:
+   - GET  http://localhost:5000/ (health check)
+   - GET  http://localhost:5000/models (list models)
+   - POST http://localhost:5000/generate (generate image)
+
+Debug mode: True
+
+2025-12-04 01:32:44,137 - werkzeug - WARNING -  * Debugger is active!
+2025-12-04 01:32:44,138 - werkzeug - INFO -  * Debugger PIN: 491-283-490
+
+
+```
+
+**Backend URL**: `http://localhost:5000`
+
+### Frontend Development Server
+
+From `src/DDPM_UI_FullStack/frontend/`:
+
+```bash
 npm run dev
 ```
 
-El frontend estará en: `http://localhost:5173`
-
-### 3. Usar tu modelo DDPM
-
-Coloca tu archivo `.pth` en:
+Expected output:
 ```
-backend/model/model.pth
-```
+VITE v5.0.8  ready in 234 ms
 
-## Tecnologías
-
-**Backend:**
-- Python 3.10+
-- Flask
-- PyTorch
-- PIL (Pillow)
-- NumPy
-
-**Frontend:**
-- React 18
-- Vite 5
-- Tailwind CSS 3
-- PostCSS
-
-## API Endpoints
-
-### `GET /`
-Health check del servidor
-
-### `POST /generate`
-Genera una imagen usando DDPM
-
-**Request:**
-```json
-{
-  "image_size": [64, 64],
-  "channels": 3,
-  "num_steps": 50
-}
+➜  Local:   http://localhost:5173/
+➜  Network: use --host to expose
 ```
 
-**Response:**
-```json
-{
-  "image": "<base64_png>",
-  "status": "success",
-  "mode": "model"
-}
-```
+**Frontend URL**: `http://localhost:5173`
 
-### `GET /config`
-Configuración del servidor
+### Production Build (Frontend)
 
-## Uso
-
-1. **Abrir la aplicación web** en `http://localhost:5173`
-2. **Presionar "Generar Imagen"** para crear una nueva imagen
-3. **Esperar** mientras el modelo genera la imagen
-4. **Visualizar** la imagen generada
-5. **Descargar** (opcional) la imagen en PNG
-
-
-## Licencia
-
-Este proyecto es de código abierto y está disponible para uso educativo.
-
-
-# Guía de Inicio Rápido
-
-## Inicio Rápido 
-
-### Linux/Mac:
 ```bash
-./start.sh
+cd src/DDPM_UI_FullStack/frontend/
+npm run build
+npm run preview
 ```
-
-### Windows:
-```cmd
-start.bat
-```
-
-Estos scripts automáticamente:
-- Verifican requisitos (Python, Node.js)
-- Instalan dependencias
-- Inician backend y frontend
-- Abren los servicios en el navegador
 
 ---
 
-## Inicio Manual
+## Model Integration
 
-### Paso 1: Backend
+### Model Storage
 
-```bash
-cd backend
-
-# Crear entorno virtual (opcional pero recomendado)
-python3 -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate.bat
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Iniciar servidor
-python app.py
+Place trained PyTorch models in:
+```
+src/DDPM_UI_FullStack/backend/model/SerializedModels/
 ```
 
-Backend disponible en: http://localhost:5000
+### Supported Formats
 
-### Paso 2: Frontend
+**File Extensions**: `.pt`, `.pth`
 
-En otra terminal:
+**Checkpoint Formats**:
 
-```bash
-cd frontend
-
-# Instalar dependencias
-npm install
-
-# Iniciar servidor de desarrollo
-npm run dev
+1. **State Dictionary**:
+```python
+torch.save(model.state_dict(), 'model.pt')
 ```
 
-Frontend disponible en: http://localhost:5173
+2. **Full Model**:
+```python
+torch.save(model, 'model.pt')
+```
+
+3. **Training Checkpoint**:
+```python
+torch.save({
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    'epoch': epoch,
+    'loss': loss,
+}, 'checkpoint.pt')
+```
+
+All formats are automatically detected and loaded by the Model Manager.
+
+### Model Naming
+
+Models are identified by their filename (without extension):
+- `celeba_ddpm_v1.pt` → Model name: `celeba_ddpm_v1`
+- `face_gen_epoch50.pth` → Model name: `face_gen_epoch50`
 
 ---
-
-## Usar tu Modelo DDPM
-
-### Opción 1: Modelo Simple
-1. Coloca tu archivo `.pth` en: `backend/model/model.pth`
-2. Reinicia el backend
-3. ¡Listo! El servidor detectará automáticamente el modelo
-
-### Opción 2: Modelo con Arquitectura Personalizada
-
-Si tu modelo requiere una arquitectura específica:
-
-1. Edita `backend/model/ddpm_loader.py`:
-   - Define tu clase de modelo (ej: UNet)
-   - Actualiza la función `load_model()` para instanciar tu arquitectura
-
-2. Edita `backend/model/ddpm_inference.py`:
-   - Actualiza `generate_image()` con tu lógica de inferencia
-   - Implementa el proceso de denoising específico de tu modelo
-
-3. Revisa `backend/EXAMPLE_CUSTOM_DDPM.py` para ejemplos detallados
-
----
-
-## Verificar Instalación
-
-### Test del Backend:
-
-```bash
-cd backend
-python test_backend.py
-```
-
-Esto probará:
-- Health check
-- Generación de imágenes
-- Configuración
-
-### Test Manual:
-
-**Backend:**
-```bash
-curl http://localhost:5000/
-```
-
-**Frontend:**
-Abre http://localhost:5173 en tu navegador
-
----
-
-## Uso de la Aplicación
-
-1. **Abrir** http://localhost:5173 en tu navegador
-2. **Presionar** el botón "✨ Generar Imagen"
-3. **Esperar** mientras el modelo genera la imagen
-4. **Ver** la imagen generada
-5. **Descargar** (opcional) usando el botón "💾 Descargar"
-
----
-
-## Estructura de Archivos
-
-```
-UI-Test/
-├── backend/                    # Backend Flask
-│   ├── app.py                 # Servidor principal
-│   ├── model/
-│   │   ├── ddpm_loader.py    # Carga del modelo
-│   │   ├── ddpm_inference.py # Inferencia
-│   │   └── model.pth         # Tu modelo (colócalo aquí)
-│   ├── utils/
-│   │   └── image_utils.py    # Utilidades de imagen
-│   ├── requirements.txt       # Dependencias Python
-│   └── test_backend.py       # Tests
-│
-├── frontend/                   # Frontend React
-│   ├── src/
-│   │   ├── App.jsx           # App principal
-│   │   ├── main.jsx          # Entry point
-│   │   └── components/
-│   │       └── ImageGenerator.jsx  # Componente generador
-│   ├── package.json          # Dependencias Node
-│   └── vite.config.js        # Config Vite
-│
-├── start.sh                   # Script de inicio (Linux/Mac)
-├── start.bat                  # Script de inicio (Windows)
-└── README.md                  # Documentación principal
-```
-
-
-# Integration Guide - Dynamic Model Selection System
-
-## System Overview
-
-The DDPM Image Generator has been refactored to support dynamic model selection from a `SerializedModels/` directory. Users can now choose from any available model at runtime without code changes.
-
-## Architecture
-
-```
-Frontend (React)          Backend (Flask)              File System
-    │                         │                            │
-    ├─ App.jsx               ├─ app.py                     │
-    │                        │   ├─ /models (GET)          │
-    │                        │   ├─ /generate (POST)       │
-    │                        │   ├─ / (GET)                │
-    │                        │   └─ /config (GET)          │
-    │                        │                              │
-    │                        ├─ model_manager.py            │
-    │                        │   ├─ ModelManager            │
-    │                        │   └─ ModelValidator          │
-    │                        │                              │
-    └─ ImageGenerator.jsx───┼─ ddpm_loader.py             ├─ SerializedModels/
-       (Model Selector)      ├─ ddpm_inference.py          ├─ model1.pt
-                             └─ image_utils.py            ├─ model2.pth
-                                                           └─ model3.pt
-```
-
-## Setup Instructions
-
-### 1. Prepare Models Directory
-
-```bash
-mkdir -p backend/model/SerializedModels
-# Place your .pt or .pth files here
-cp /path/to/your/models/*.pt backend/model/SerializedModels/
-```
-
-### 2. Backend Setup
-
-**No additional installation required** - all dependencies already in `requirements.txt`
-
-```bash
-cd backend
-pip install -r requirements.txt
-python app.py
-```
-
-Backend will:
-- Scan `SerializedModels/` directory
-- List available models on startup
-- Wait for requests on `http://localhost:5000`
-
-### 3. Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend will:
-- Start dev server on `http://localhost:5173`
-- Fetch models from backend on load
-- Display model selector
-
-## Usage Flow
-
-### User Perspective
-
-1. **Load Application**
-   - Open `http://localhost:5173` in browser
-   - App fetches available models from backend
-   - Model dropdown populates automatically
-   - First model auto-selected
-
-2. **Select Model**
-   - Choose desired model from dropdown
-   - Model name displayed in info panel
-
-3. **Generate Image**
-   - Click "Generate Image" button
-   - Loading spinner appears
-   - Backend processes request
-   - Image appears when ready
-   - Can download or generate again
-
-### Behind the Scenes
-
-**Frontend → Backend Request:**
-```
-POST http://localhost:5000/generate
-Content-Type: application/json
-
-{
-  "model": "model1",
-  "image_size": [64, 64],
-  "channels": 3,
-  "num_steps": 50
-}
-```
-
-**Backend Processing:**
-1. Validate model name (security check)
-2. Check if model exists
-3. Load model from disk (or cache)
-4. Run inference with model
-5. Convert output to base64
-6. Send image back to frontend
-
-**Backend → Frontend Response:**
-```
-{
-  "status": "success",
-  "image": "iVBORw0KGgoAAAANSUhEUgAA...",
-  "mode": "model",
-  "model_used": "model1",
-  "image_size": [64, 64],
-  "channels": 3
-}
-```
 
 ## API Reference
-
-### GET /models
-
-Fetch list of available models.
-
-**Request:**
-```bash
-curl http://localhost:5000/models
-```
-
-**Response:**
-```json
-{
-  "status": "success",
-  "models": [
-    {
-      "name": "model1",
-      "path": "/full/path/to/model1.pt",
-      "extension": ".pt",
-      "size_mb": 123.45
-    },
-    {
-      "name": "model2",
-      "path": "/full/path/to/model2.pth",
-      "extension": ".pth",
-      "size_mb": 234.56
-    }
-  ],
-  "count": 2
-}
-```
-
-**Status Codes:**
-- `200`: Success
-- `500`: Server error
-
----
-
-### POST /generate
-
-Generate image with selected model.
-
-**Request:**
-```json
-{
-  "model": "model1",
-  "image_size": [64, 64],
-  "channels": 3,
-  "num_steps": 50
-}
-```
-
-**Response (Success):**
-```json
-{
-  "image": "<base64_encoded_png>",
-  "status": "success",
-  "mode": "model",
-  "model_used": "model1",
-  "image_size": [64, 64],
-  "channels": 3
-}
-```
-
-**Response (Error - Model not found):**
-```json
-{
-  "status": "error",
-  "message": "Model \"model1\" not found",
-  "available_models": ["model2", "model3"]
-}
-```
-
-**Status Codes:**
-- `200`: Success
-- `400`: Bad request (model not found, invalid name)
-- `404`: Model file missing
-- `500`: Server error
-
----
 
 ### GET /
 
 Health check endpoint.
 
-**Response:**
+**Response**:
 ```json
 {
   "status": "online",
@@ -487,20 +355,103 @@ Health check endpoint.
 }
 ```
 
+**Status Codes**: 200 (Success)
+
+---
+
+### GET /models
+
+List all available models.
+
+**Request**:
+```bash
+curl http://localhost:5000/models
+```
+
+**Response**:
+```json
+{
+  "status": "success",
+  "models": [
+    {
+      "name": "celeba_model",
+      "path": "/full/path/to/celeba_model.pt",
+      "extension": ".pt",
+      "size_mb": 145.23
+    },
+    {
+      "name": "face_gen",
+      "path": "/full/path/to/face_gen.pth",
+      "extension": ".pth",
+      "size_mb": 152.67
+    }
+  ],
+  "count": 2
+}
+```
+
+---
+
+### POST /generate
+
+Generate an image using a specified model.
+
+**Request**:
+```bash
+curl -X POST http://localhost:5000/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "celeba_model",
+    "image_size": [64, 64],
+    "channels": 3,
+    "num_steps": 50
+  }'
+```
+
+**Request Body Parameters**:
+
+| Parameter    | Type         | Required | Default  | Description                          |
+|-------------|--------------|----------|----------|--------------------------------------|
+| `model`     | string       | Yes      | -        | Model name (without extension)       |
+| `image_size`| array[int,int]| No      | [64, 64] | Output image dimensions [H, W]       |
+| `channels`  | integer      | No       | 3        | Number of channels (1=Gray, 3=RGB)   |
+| `num_steps` | integer      | No       | 50       | Denoising iterations                 |
+
+**Response (Success)**:
+```json
+{
+  "status": "success",
+  "image": "iVBORw0KGgoAAAANSUhEUgAA...",
+  "mode": "model",
+  "model_used": "celeba_model",
+  "image_size": [64, 64],
+  "channels": 3
+}
+```
+
+**Response (Error - Model Not Found)**:
+```json
+{
+  "status": "error",
+  "message": "Model \"invalid_model\" not found",
+  "available_models": ["celeba_model", "face_gen"]
+}
+```
+
 ---
 
 ### GET /config
 
-Get server configuration.
+Retrieve server configuration.
 
-**Response:**
+**Response**:
 ```json
 {
   "device": "cuda",
   "cache_enabled": true,
   "cache_info": {
     "cached_models": 1,
-    "model_names": ["model1"]
+    "model_names": ["celeba_model"]
   },
   "models_directory": "/path/to/SerializedModels",
   "models_available": 2,
@@ -509,307 +460,152 @@ Get server configuration.
 }
 ```
 
-## Configuration
+---
 
-### Backend Configuration
+## Image Generation Pipeline
 
-Edit `backend/app.py`:
-
-```python
-# Enable/disable model caching
-ENABLE_MODEL_CACHE = True
-
-# Default image generation size
-IMAGE_SIZE = (64, 64)
-
-# Default number of channels (3=RGB, 1=Grayscale)
-CHANNELS = 3
-
-# Models directory (relative to app.py)
-MODELS_DIR = os.path.join(os.path.dirname(__file__), 'model', 'SerializedModels')
-```
-
-### Frontend Configuration
-
-Edit `frontend/src/components/ImageGenerator.jsx`:
-
-```javascript
-// Backend URL
-const BACKEND_URL = 'http://localhost:5000'
-
-// Generation parameters (can be modified)
-image_size: [64, 64],
-channels: 3,
-num_steps: 50
-```
-
-## File Structure
+### High-Level Process
 
 ```
-UI-Test/
-├── backend/
-│   ├── app.py                              # Main server (UPDATED)
-│   ├── model/
-│   │   ├── model_manager.py               # NEW - Model management
-│   │   ├── ddpm_loader.py                 # Model loading utilities
-│   │   ├── ddpm_inference.py              # Image generation
-│   │   ├── __init__.py
-│   │   └── SerializedModels/              # NEW - Model storage
-│   │       ├── model1.pt                  # Your models here
-│   │       ├── model2.pth
-│   │       └── ...
-│   ├── utils/
-│   │   └── image_utils.py                 # Image utilities
-│   └── requirements.txt
-│
-└── frontend/
-    ├── src/
-    │   ├── App.jsx                        # Main app (UPDATED)
-    │   ├── main.jsx
-    │   ├── styles.css                     # Global styles (UPDATED)
-    │   └── components/
-    │       └── ImageGenerator.jsx         # Main component (UPDATED)
-    ├── package.json
-    ├── vite.config.js
-    ├── tailwind.config.js
-    └── postcss.config.js
-```
+1. Frontend Request
+   └─> User selects model and clicks "Generate"
 
-## Model Format Requirements
+2. HTTP POST to /generate
+   └─> JSON payload with model name and parameters
 
-### File Extensions
-- `.pt` (PyTorch)
-- `.pth` (PyTorch)
+3. Backend Validation
+   ├─> Validate model name (security check)
+   ├─> Check model availability
+   └─> Extract generation parameters
 
-### Checkpoint Format
+4. Model Loading
+   ├─> Check model cache
+   ├─> Load from disk if not cached
+   └─> Move to GPU/CPU as appropriate
 
-Models should be saved in one of these formats:
+5. Inference Pipeline
+   ├─> Initialize Gaussian noise tensor
+   ├─> Iterative denoising loop (num_steps iterations)
+   │   ├─> Model predicts noise at timestep t
+   │   ├─> Remove predicted noise
+   │   └─> Add scaled noise (except final step)
+   └─> Clamp output to [0, 1]
 
-**Option 1: State Dict**
-```python
-torch.save(model.state_dict(), 'model.pt')
-```
+6. Image Conversion
+   ├─> Tensor → NumPy array
+   ├─> Normalize to [0, 255]
+   ├─> Convert to PIL Image
+   └─> Encode as base64 PNG
 
-**Option 2: Full Model**
-```python
-torch.save(model, 'model.pt')
-```
+7. Response Delivery
+   └─> JSON with base64 image string
 
-**Option 3: Checkpoint**
-```python
-torch.save({
-    'model_state_dict': model.state_dict(),
-    'optimizer_state_dict': optimizer.state_dict(),
-    'epoch': epoch,
-}, 'model.pt')
-```
-
-All formats are supported automatically!
-
-
-# 🔄 Flujo de Trabajo del Sistema DDPM
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        ARQUITECTURA DEL SISTEMA                      │
-└─────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────┐         HTTP POST          ┌──────────────────┐
-│                  │    /generate (JSON)         │                  │
-│   FRONTEND       │ ──────────────────────────> │    BACKEND       │
-│   React + Vite   │                             │   Flask + PyTorch│
-│   Port: 5173     │ <────────────────────────── │   Port: 5000     │
-│                  │    JSON (base64 image)      │                  │
-└──────────────────┘                             └──────────────────┘
-        │                                                  │
-        │                                                  │
-        ▼                                                  ▼
-┌──────────────────┐                             ┌──────────────────┐
-│  UI Components   │                             │  Model Loader    │
-│  - ImageGenerator│                             │  - Load .pth     │
-│  - Button        │                             │  - Detect GPU    │
-│  - Loader        │                             │  - Prepare model │
-│  - Image Display │                             └──────────────────┘
-└──────────────────┘                                      │
-                                                          ▼
-                                                 ┌──────────────────┐
-                                                 │  DDPM Inference  │
-                                                 │  - Generate noise│
-                                                 │  - Denoising loop│
-                                                 │  - Return tensor │
-                                                 └──────────────────┘
-                                                          │
-                                                          ▼
-                                                 ┌──────────────────┐
-                                                 │  Image Utils     │
-                                                 │  - Tensor to PIL │
-                                                 │  - PIL to base64 │
-                                                 │  - Normalize     │
-                                                 └──────────────────┘
+8. Frontend Rendering
+   └─> Decode and display in <img> tag
 ```
 
 ---
 
-## 📋 Flujo de Generación de Imagen
+## Configuration
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    PROCESO DE GENERACIÓN                             │
-└─────────────────────────────────────────────────────────────────────┘
+### Backend Configuration
 
-1. USUARIO
-   │
-   └─> Presiona "Generar Imagen"
-       │
-       ▼
+Edit `src/DDPM_UI_FullStack/backend/app.py`:
 
-2. FRONTEND (ImageGenerator.jsx)
-   │
-   ├─> setLoading(true)
-   ├─> fetch('http://localhost:5000/generate', {...})
-   └─> Muestra loader animado
-       │
-       ▼
+```python
+# Model caching
+ENABLE_MODEL_CACHE = True
 
-3. BACKEND (app.py)
-   │
-   ├─> Recibe POST request
-   ├─> Extrae parámetros (size, channels, steps)
-   └─> Llama generate_image()
-       │
-       ▼
+# Default generation parameters
+IMAGE_SIZE = (64, 64)
+CHANNELS = 3
 
-4. DDPM INFERENCE (ddpm_inference.py)
-   │
-   ├─> Inicializa ruido gaussiano
-   ├─> Loop de denoising (num_steps veces)
-   │   ├─> Predice ruido con modelo
-   │   ├─> Aplica step de denoising
-   │   └─> Agrega ruido si no es último step
-   ├─> Normaliza resultado [0, 1]
-   └─> Convierte tensor a PIL Image
-       │
-       ▼
-
-5. IMAGE UTILS (image_utils.py)
-   │
-   ├─> tensor_to_pil()
-   │   ├─> Mueve a CPU
-   │   ├─> Clamp [0, 1]
-   │   ├─> Convierte a numpy
-   │   ├─> Transpone (C,H,W) → (H,W,C)
-   │   └─> Escala a [0, 255]
-   │
-   └─> pil_to_base64()
-       ├─> Guarda en BytesIO buffer
-       ├─> Codifica a base64
-       └─> Retorna string
-       │
-       ▼
-
-6. BACKEND (app.py)
-   │
-   └─> Retorna JSON:
-       {
-         "image": "<base64_string>",
-         "status": "success",
-         "mode": "model"
-       }
-       │
-       ▼
-
-7. FRONTEND (ImageGenerator.jsx)
-   │
-   ├─> Recibe response
-   ├─> setImageData(data.image)
-   ├─> setLoading(false)
-   └─> Renderiza: <img src={`data:image/png;base64,${imageData}`} />
-       │
-       ▼
-
-8. USUARIO
-   │
-   └─> Ve la imagen generada ✅
+# Model directory
+MODELS_DIR = os.path.join(
+    os.path.dirname(__file__), 
+    'model', 
+    'SerializedModels'
+)
 ```
 
+### Frontend Configuration
 
-# DDPM Image Generator - Frontend
-
-Interfaz web en React para consumir el backend DDPM y visualizar imágenes generadas.
-
-## Requisitos
-
-- Node.js 16+
-- npm o yarn
-
-## Instalación
-
-1. Navega a la carpeta del frontend:
-```bash
-cd frontend
-```
-
-2. Instala las dependencias:
-```bash
-npm install
-```
-
-## Ejecución
-
-### Modo Desarrollo
-
-```bash
-npm run dev
-```
-
-La aplicación estará disponible en: `http://localhost:5173`
-
-### Build para Producción
-
-```bash
-npm run build
-```
-
-### Preview del Build
-
-```bash
-npm run preview
-```
-
-## Estructura
-
-```
-frontend/
-├── index.html              # HTML principal
-├── package.json            # Dependencias y scripts
-├── vite.config.js          # Configuración de Vite
-├── tailwind.config.js      # Configuración de Tailwind
-├── postcss.config.js       # Configuración de PostCSS
-└── src/
-    ├── main.jsx            # Punto de entrada React
-    ├── App.jsx             # Componente principal
-    ├── styles.css          # Estilos globales + Tailwind
-    └── components/
-        └── ImageGenerator.jsx  # Componente generador
-```
-
-## Configuración
-
-### Backend URL
-
-El frontend está configurado para conectarse a:
-```javascript
-const BACKEND_URL = 'http://localhost:5000/generate'
-```
-
-### Parámetros de Generación
-
-Puedes personalizar los parámetros de generación en `ImageGenerator.jsx`:
+Edit `src/DDPM_UI_FullStack/frontend/src/components/ImageGenerator.jsx`:
 
 ```javascript
-body: JSON.stringify({
-  image_size: [64, 64],  // Tamaño de la imagen
-  channels: 3,            // Canales (3=RGB, 1=Grayscale)
-  num_steps: 50           // Pasos de denoising
+// Backend API URL
+const BACKEND_URL = 'http://localhost:5000'
+
+// Default generation parameters
+const defaultParams = {
+  image_size: [64, 64],
+  channels: 3,
+  num_steps: 50
+}
+```
+
+### CORS Configuration
+
+Modify allowed origins in `app.py`:
+
+```python
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "http://localhost:5173", 
+            "http://127.0.0.1:5173",
+            "http://your-domain.com"  # Add production domain
+        ],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
 })
 ```
+
+---
+
+## Licenses and References
+
+- **pico-banana-400k Dataset**
+
+```
+@misc{qian2025picobanana400klargescaledatasettextguided,
+      title={Pico-Banana-400K: A Large-Scale Dataset for Text-Guided Image Editing}, 
+      author={Yusu Qian and Eli Bocek-Rivele and Liangchen Song and Jialing Tong and Yinfei Yang and Jiasen Lu and Wenze Hu and Zhe Gan},
+      year={2025},
+      eprint={2510.19808},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2510.19808}, 
+}
+```
+
+- **CELEBA Dataset**
+```
+@inproceedings{liu2015faceattributes,
+  title = {Deep Learning Face Attributes in the Wild},
+  author = {Liu, Ziwei and Luo, Ping and Wang, Xiaogang and Tang, Xiaoou},
+  booktitle = {Proceedings of International Conference on Computer Vision (ICCV)},
+  month = {December},
+  year = {2015} 
+}
+```
+
+- **CIFAR10 Dataset**
+
+> [Learning Multiple Layers of Features from Tiny Images](https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf), Alex Krizhevsky, 2009.
+
+- **Articles and Reference Implementations**
+
+  - [DDPM from scratch in Pytorch](https://www.kaggle.com/code/vikramsandu/ddpm-from-scratch-in-pytorch#Diffusion-Model---The-Structure)
+
+  - [U-Net Architecture Explained](https://www-geeksforgeeks-org.translate.goog/machine-learning/u-net-architecture-explained/?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc)
+
+  - [DDPM PyTorch Implementation from Scratch](https://medium.com/@sayedebad.777/ddpm-pytorch-implementation-from-scratch-36b647f5dd82)
+
+
+# Contact
+This project was developed by:
+- Alyson Melissa Sánchez Serratos
+- Miguel Ángel Pérez Ávila
+ 
