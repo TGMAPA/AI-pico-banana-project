@@ -21,7 +21,8 @@ dev/data/open-image-mapping-resources/source-info/filtered_sft_with_local_source
 # Model serialized Objects and model checkpoints
 dev/src/model/ModelCheckpoints
 dev/src/model/SerializedObjects
-dev/src/model/TrainingLogs
+dev/src/model/
+dev/src/DDPM_UI_FullStack/backend/model/SerializedObjects/*
 
 # General files
 *.zip
