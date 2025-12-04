@@ -29,7 +29,6 @@ env.bak/
 venv.bak/
 
 # PyTorch models
-*.pth
 *.pt
 *.ckpt
 

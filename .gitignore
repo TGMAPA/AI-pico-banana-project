@@ -22,7 +22,7 @@ dev/data/open-image-mapping-resources/source-info/filtered_sft_with_local_source
 dev/src/model/ModelCheckpoints
 dev/src/model/SerializedObjects
 dev/src/model/
-dev/src/DDPM_UI_FullStack/backend/model/SerializedObjects/*
+#dev/src/DDPM_UI_FullStack/backend/model/SerializedObjects/*
 
 # General files
 *.zip
@@ -65,7 +65,6 @@ env.bak/
 venv.bak/
 
 # PyTorch models
-*.pth
 *.pt
 *.ckpt
 
