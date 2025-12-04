@@ -4,6 +4,7 @@ from src.config.libraries import *
 
 # ====== Configuration file ====== 
 
+# ------ Configuration for model training: dev/src/model/* ------
 # Device configuration
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.set_float32_matmul_precision('high')
@@ -38,9 +39,6 @@ BETA_0 = 1e-4
 BETA_N = 0.02
 
 # N_Self_attention_heads per UNET Block
-# N_ATTN_HEADS_ENCODER = 4
-# N_ATTN_HEADS_MIDDLE = 2
-# N_ATTN_HEADS_DECODER = 10
 N_ATTN_HEADS_ENCODER = 4
 N_ATTN_HEADS_MIDDLE = 4
 N_ATTN_HEADS_DECODER = 4
@@ -92,3 +90,17 @@ MODEL_SERIALIZED_PATH = MODEL_SERIALIZED_DIR_PATH + "/" + MODEL_NAME + "_weights
 N_INFERENCES_2_EXEC = 9
 OUTPUT_INFERENCES_DIR = "src/"+MODEL_NAME+"_OUTPUT_INFERENCES"
 os.makedirs(OUTPUT_INFERENCES_DIR, exist_ok=True)
+
+# -------------------------------------------------------------------------------
+
+
+
+
+# ------ Configuration for model training: dev/src/DDPM_UI_FullStack/* ------
+
+
+
+
+
+
+# -------------------------------------------------------------------------------

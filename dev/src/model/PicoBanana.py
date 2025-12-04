@@ -24,24 +24,28 @@ class PicoBanana:
             num_workers = 4, 
             train_proportion = 0.8, 
             val_proportion = 0.8,
-            seed = 42
+            seed = 42,
+            load_dm = True
         ):
 
         # General class properties
         self.model = None
         self.learning_rate = None
 
-        # Create DataModule
-        self.dm  = PicoBananaDataModule(
-            annotations_file=IO_DATASET_MAP_LOCAL_PATH, 
-            batch_size=batch_size, 
-            num_workers=num_workers, 
-            train_transform= Transformations.train_transform, 
-            test_transform= Transformations.test_transform, 
-            train_proportion=train_proportion, 
-            val_proportion=val_proportion,
-            seed=seed
-        )
+        if load_dm:
+            # Create DataModule
+            self.dm  = PicoBananaDataModule(
+                annotations_file=IO_DATASET_MAP_LOCAL_PATH, 
+                batch_size=batch_size, 
+                num_workers=num_workers, 
+                train_transform= Transformations.train_transform, 
+                test_transform= Transformations.test_transform, 
+                train_proportion=train_proportion, 
+                val_proportion=val_proportion,
+                seed=seed
+            )
+        else:
+            self.dm = None
 
     # Execute model training
     def train(
