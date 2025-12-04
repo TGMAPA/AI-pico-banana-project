@@ -1,4 +1,4 @@
-# Import libraries and required modules
+#import libraries and required modules
 from src.config.libraries import *
 
 
@@ -10,13 +10,12 @@ torch.set_float32_matmul_precision('medium')
 
 # -- General dataset and data (images) params obtained from "dev/data/exploration-scripts/image_explore.ipynb"
 # Image crop transform measures
-IMAGE_HEIGHTS_MEDIAN = 76
-IMAGE_WIDTHS_MEDIAN = 76
+IMAGE_HEIGHTS_MEDIAN = 100
+IMAGE_WIDTHS_MEDIAN = 100
 IMAGE_CHANNELS = 3
 
 # Numbers of samples used for dataset split
 N_SAMPLES = 202599
-
 
 # -- Model's Training Phase Parameters
 BATCH_SIZE = 2
@@ -32,6 +31,7 @@ TRAINER_PRECISION = "16-mixed"
 
 
 # -- DDPM Parameters
+
 # Time embedding's params
 N_T_STEPS = 500
 BETA_0 = 1e-4
