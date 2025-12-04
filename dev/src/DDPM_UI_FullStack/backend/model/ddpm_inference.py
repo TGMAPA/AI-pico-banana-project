@@ -33,9 +33,7 @@ def generate_image(model, device, image_size=(76, 76), channels=3, num_steps=500
     """
     print(f"Generating image {channels}x{image_size[0]}x{image_size[1]}...")
     # Get n number of Inferences
-    xt = model.inference()      # (1, C, H, W) en [0,1]
-    img = xt[0].cpu().numpy()         # (C, H, W)
-    img = (img * 255).clip(0, 255).astype(np.uint8)  # [0,1] -> [0,255] uint8
+    img = model.inference()   
        
     print("Image generated successfully")
         

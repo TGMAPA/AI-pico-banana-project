@@ -91,8 +91,20 @@ class PicoBanana:
             val_dataloaders = self.dm.val_dataloader()
         )
 
+    # Bring resultant inference from model to visualization fromat
+    def transform_to_visualization(self, x):
+        # Bring result to [0, 1] for visualization
+        x = torch.clamp(x, -1., 1.).detach().to(DEVICE)
+        x = (x + 1)/ 2.0 # [-1,1] to [0,1]
+        x = x[0].cpu().numpy() # (C, H, W)
+        # transpose to (H,W,C)
+        x = np.transpose(x, (1,2,0))
+
+        x = (x * 255).clip(0,255).astype(np.uint8)  # [0,1] to [0,255] uint8
+        return x
+
     # Method for generating new images with trained model
-    def inference(self):
+    def inference(self, return_diffusion_vector = False):
         # Verify if there is a model loaded
         assert self.model is not None, "Training Phase is missing for model's inference mode" 
 
@@ -109,17 +121,26 @@ class PicoBanana:
         # Generate noise sample from N(0,1)
         xt = torch.randn(1, IMAGE_CHANNELS, IMAGE_HEIGHTS_MEDIAN, IMAGE_WIDTHS_MEDIAN).to(DEVICE)
         
+        # Create list for image storage while execution inverse diffusion process
+        if return_diffusion_vector:
+            imgs_inv_diff = []
+            imgs_inv_diff.append(self.transform_to_visualization(xt))
+
         # Compute model's predictions (noise)
         with torch.no_grad():
             for t in reversed(range(N_T_STEPS)):
                 noise_pred = self.model(xt, torch.as_tensor(t).unsqueeze(0).to(DEVICE))
                 xt, x0 = difusion_reversed.reverse_timestep(xt, noise_pred, torch.as_tensor(t).to(DEVICE))
 
-        # Bring result to [0, 1] for visualization
-        xt = torch.clamp(xt, -1., 1.).detach().to(DEVICE)
-        xt = (xt + 1) / 2.0  # [-1,1] -> [0,1]
-
-        return xt
+                # Store reversed diffused image per step
+                if return_diffusion_vector:            
+                    imgs_inv_diff.append(self.transform_to_visualization(xt))
+        
+        # Return image or image vector
+        if not return_diffusion_vector:
+            return self.transform_to_visualization(xt)
+        else:
+            return imgs_inv_diff
         
     # Method for loading pretrained picobanana model
     def load_model(self, serialized_object_path = MODEL_SERIALIZED_PATH):
@@ -191,7 +212,7 @@ class PicoBanana:
         plt.axis("off")
         plt.title("Training batch")
 
-        # Crear torch grid
+        # Create torch grid
         grid = torchvision.utils.make_grid(
             images[:n],   
             nrow=int(n * 0.35),       

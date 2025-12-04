@@ -271,7 +271,7 @@ def generate():
             mode = "sample"
         
         # Transform ndarray C,H,W → H,W,C
-        image = np.transpose(image, (1, 2, 0))
+        #image = np.transpose(image, (1, 2, 0))
 
         # Transform to PIL
         pil_image = Image.fromarray(image)

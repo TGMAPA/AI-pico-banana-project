@@ -19,15 +19,13 @@ def execute_inference():
         val_proportion = VAL_PROPORTION
     )
 
-    # Load Model from Checkpoint
+    # Load Model from Checkpointi
     model.load_from_checkpoint(CHECKPOINTS_DIR_PATH + "best_model_" + MODEL_NAME + ".ckpt")
 
     # Get n number of Inferences
     generated_imgs = []
     for i in tqdm(range(N_INFERENCES_2_EXEC)):
         xt = model.inference()      # (1, C, H, W) en [0,1]
-        img = xt[0].cpu().numpy()         # (C, H, W)
-        img = (img * 255).clip(0, 255).astype(np.uint8)  # [0,1] -> [0,255] uint8
         generated_imgs.append(img)
 
     # Plot inferences

@@ -13,6 +13,7 @@ import torchmetrics
 import time
 import os
 from tqdm import tqdm
+import cv2
 
 
 # Fullstack UI imports
