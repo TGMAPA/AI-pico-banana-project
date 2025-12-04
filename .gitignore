@@ -3,6 +3,7 @@ dev/data/openimage_source_images/input/train_0
 dev/data/openimage_source_images/input/train_1
 dev/data/openimage_source_images/output
 dev/data/openimage_source_images/input
+dev/data/celeba/*
 
 # Resources maps and csv
 dev/data/open-image-mapping-resources/source-info/train-images-boxable-with-rotation.csv
